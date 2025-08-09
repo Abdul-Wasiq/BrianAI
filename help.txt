@@ -1,0 +1,54 @@
+🧩 PROJECT MAP
+   __index.html__:
+Login/Sign up, Pop up – (10-41)
+LEFT Side bar – (44-92)
+Body – (94-131)
+Input box – (133-163)
+Right Side Bar(Chat History Bar) – (165-190)
+ 
+   __style.css__
+Light/Dark Mode – (1-120)
+General Body & Element Styles – (122-135)
+Slide Bar – (136-301)
+Header – (303-352)
+Welcome – (354-484)
+chat box – (486-580)
+Output Box(Code,Output,Preview) – (582-709)
+Input – (711-849)
+Setting Icon/Profile Picture and More... – (851-1037)
+
+   __main.js__
+SLIDE BAR – (4-57)
+Login/Sign up – (58-157)
+Showing box each second – (168)
+Light and Dark Mode – (177)
+Sidebar Hover & Toggle Logic – (241)
+Textarea Auto-Resize Logic – (288)
+Typing Animation on greeting Logic – (299)
+Brian AI Logo SVG Generation Function – (348)
+Greet with user's name – (355)
+Message Parsing and Display – (400)
+sendMessage() function – (419)
+control response – (419)
+Create container for user message (avatar + bubble) – (440)
+Show "Brian is thinking..." message – (455)
+handles message – (472)
+typing animation effect – (542)
+CODE,OUTPUT,PREVIEW – (569)
+FULL SCREEN OF (CODE,OUTPUT,PREVIEW) – (697)
+I am not sure about it that it removes characters or for output – (736)
+Input Area Fullscreen Toggle – (744)
+updateUserProfileUI – (761)
+hideAllSidebarPanels – (784)
+
+
+  __main.py__
+import libraries – (8-14)
+API Key – (19)
+content – (25)
+get text and give response – (53-111)
+User Account Management:
+SignUp – (113)
+Login – (167)
+running the server – (192)
+

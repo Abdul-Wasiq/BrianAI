@@ -1,0 +1,1262 @@
+     /* === [LIGHT AND DARK MODE] === */
+:root {
+    /* General Colors */
+    --bg-color: #f6fff9;
+    --text-color: #333;
+    --border-color: #e0e0e0;
+
+    /* Sidebar Colors */
+    --sidebar-bg: #ffffff;
+    --sidebar-hover-bg: #e9f3ff;
+    --sidebar-hover-color: #003366;
+
+    /* Chat Message Colors */
+    --chat-bg: #ffffff; /* Default chat box background */
+    --user-msg-bg: #e9f3ff; /* Light blue for user */
+    --user-msg-color: #003366; /* Dark blue for user text */
+    --bot-msg-bg: #f0f5f1; /* Light green-grey for bot */
+    --bot-msg-color: #2d4739; /* Dark green for bot text */
+    --avatar-bg-user: #a0c4ff;
+    --avatar-bg-bot: #c9e2b3; /* Keep for general bot avatar if not using logo */
+
+    /* Input Area Colors */
+    --input-bg: #ffffff;
+    --input-border-focus: #a0c4ff;
+    --input-button-color: #666; /* Color for action buttons in input */
+    --input-button-hover-bg: #f0f0f0;
+
+    /* Button Colors */
+    --button-bg: #3f51b5;
+    --button-hover-bg: #303f9f;
+
+    /* Highlight Color */
+    --highlight-bg: #ffeb3b;
+    --highlight-color: #333;
+
+    /* Code/Tool Output Box Colors */
+    --tool-bg: #f8f8f8; /* Lighter background for code block in light mode */
+    --tool-text-color: #333; /* Default text color for tool content in light mode */
+    --code-text-color: #007acc; /* Specific color for code in light mode */
+    --output-text-color: #008000; /* Specific color for output in light mode */
+    --tool-header-border: #ddd;
+    --tool-tab-active-bg: rgba(0, 0, 0, 0.05);
+    --tool-tab-hover-bg: rgba(0, 0, 0, 0.02);
+    --tool-fullscreen-toggle-hover: rgba(0, 0, 0, 0.05);
+
+    /* Iframe background in light mode */
+    --iframe-bg: #ffffff;
+
+    /* Tooltip colors */
+    --tooltip-bg: #333;
+    --tooltip-color: #fff;
+
+    /* Welcome Screen Colors */
+    --welcome-text-color: #6a6a6a; /* Lighter grey for welcome text */
+    --welcome-heading-color: #4a4a4a; /* Darker grey for main headings */
+    --welcome-bg: transparent; /* Make welcome background transparent to show main background */
+    --logo-bg: #ffffff; /* For the sense AI logo background */
+    --logo-color: #6a6a6a; /* For the sense AI logo icon */
+}
+/* === [DARK MODE] ===  */
+body.dark-mode {
+    /* General Colors */
+    --bg-color: #202123;
+    --text-color: #e0e0e0;
+    --border-color: #444;
+
+    /* Sidebar Colors */
+    --sidebar-bg: #282a2d;
+    --sidebar-hover-bg: #40414f;
+    --sidebar-hover-color: #ffffff;
+
+    /* Chat Message Colors */
+    --chat-bg: var(--bg-color); /* Match background for seamless look */
+    --user-msg-bg: #4f4f5a; /* Darker grey for user */
+    --user-msg-color: #ffffff; /* White for user text */
+    --bot-msg-bg: #40414f; /* Slightly lighter grey for bot */
+    --bot-msg-color: #d1d5da; /* Off-white for bot text */
+    --avatar-bg-user: #3f51b5; /* Purple for user avatar */
+    --avatar-bg-bot: #5b7e6e; /* Darker green for bot avatar */
+
+    /* Input Area Colors */
+    --input-bg: #40414f;
+    --input-border-focus: #3f51b5;
+    --input-button-color: #bbb;
+    --input-button-hover-bg: #555;
+
+
+    /* Button Colors */
+    --button-bg: #3f51b5;
+    --button-hover-bg: #27378f;
+
+    /* Highlight Color */
+    --highlight-bg: #3f51b5;
+    --highlight-color: #ffffff;
+
+    /* Code/Tool Output Box Colors */
+    --tool-bg: #2b2b2b;
+    --tool-text-color: #a9b7c6; /* Default text color for tool content in dark mode */
+    --code-text-color: #a9b7c6; /* Specific color for code in dark mode */
+    --output-text-color: #00ff00; /* Specific color for output in dark mode */
+    --tool-header-border: #555;
+    --tool-tab-active-bg: rgba(255, 255, 255, 0.1);
+    --tool-tab-hover-bg: rgba(255, 255, 255, 0.05);
+    --tool-fullscreen-toggle-hover: rgba(255, 255, 255, 0.1);
+
+    /* Iframe background in dark mode */
+    --iframe-bg: #303030; /* Darker background for iframe in dark mode */
+
+    /* Tooltip colors */
+    --tooltip-bg: #555;
+    --tooltip-color: #eee;
+
+    /* Welcome Screen Colors (Dark Mode) */
+    --welcome-text-color: #b0b0b0;
+    --welcome-heading-color: #f0f0f0;
+    --welcome-bg: transparent; /* Match background for seamless look */
+    --logo-bg: #383838;
+    --logo-color: #b0b0b0;
+}
+/* DARK/LIGHT MODE ENDS */
+
+/* === [General Body & Element Styles - STARTS] ===  */
+* { box-sizing: border-box; }
+body {
+    overflow-x: hidden;
+    width: 100%;
+    backface-visibility: hidden; /* Prevent rendering artifacts */
+    -webkit-backface-visibility: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-color);
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+    display: flex;
+    height: 100vh;
+    overflow: hidden; /* Control overflow for fullscreen input */
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+/* Add to your style.css */
+body:not(.welcome-screen-active) #welcomeScreen {
+  display: none !important;
+}
+.hidden-tab-content {
+  display: none !important;
+}
+/* === [SIDE BAR - STARTS] ===  */
+.sidebar-base {
+    width: 60px; /* Default collapsed width */
+    background: var(--sidebar-bg);
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: width 0.4s ease, padding 0.4s ease, background-color 0.4s ease, box-shadow 0.4s ease;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.sidebar-base.expanded {
+    width: 250px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+body.dark-mode .sidebar-base.expanded {
+     box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+.sidebar-base:not(.expanded):hover {
+    background: var(--sidebar-hover-bg);
+    color: var(--sidebar-hover-color);
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+}
+body.dark-mode .sidebar-base:not(.expanded):hover {
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+}
+
+.sidebar-base.expanded nav ul li a span,
+.sidebar-base.locked nav ul li a span,
+.sidebar-base.expanded .logout span,
+.sidebar-base.locked .logout span,
+.sidebar-base.expanded h3 .sidebar-title-text,
+.sidebar-base.locked h3 .sidebar-title-text {
+    display: inline-block;
+}
+
+.sidebar-base.expanded h3 .toggle-icon .fa-times,
+.sidebar-base.locked h3 .toggle-icon .fa-times { display: block; }
+.sidebar-base.expanded h3 .toggle-icon .fa-bars,
+.sidebar-base.locked h3 .toggle-icon .fa-bars { display: none; }
+
+
+.sidebar-base h3 {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.sidebar-base h3 .sidebar-title-text {
+    display: none;
+    transition: display 0.4s ease;
+}
+
+.sidebar-base h3 .toggle-icon {
+    cursor: pointer;
+    font-size: 1.2em;
+    padding: 0 10px;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.sidebar-base h3 .toggle-icon .fa-times { display: none; }
+.sidebar-base h3 .toggle-icon .fa-bars { display: block; }
+
+
+.sidebar-base nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-base nav ul li {
+    margin-bottom: 12px;
+}
+
+.sidebar-base nav ul li a {
+    text-decoration: none;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-base nav ul li a i {
+    margin-right: 10px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.sidebar-base nav ul li a span,
+.sidebar-base .logout span {
+    display: none;
+    transition: display 0.4s ease;
+}
+
+.sidebar-base nav ul li a {
+    justify-content: center;
+    padding: 10px 0;
+}
+.sidebar-base.expanded nav ul li a,
+.sidebar-base.locked nav ul li a {
+    justify-content: flex-start;
+    padding: 10px;
+}
+
+.sidebar-base nav ul li a:hover {
+    background: var(--sidebar-hover-bg);
+    color: var(--sidebar-hover-color);
+}
+
+.sidebar-base .logout {
+    text-decoration: none;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-radius: 8px;
+    transition: background 0.3s ease, color 0.3s ease;
+    justify-content: center;
+}
+.sidebar-base.expanded .logout,
+.sidebar-base.locked .logout {
+    justify-content: flex-start;
+    padding: 10px;
+}
+
+.sidebar-base .logout i {
+    margin-right: 10px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.main-sidebar {
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
+    border-right: 1px solid var(--border-color);
+}
+
+.history-sidebar {
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.02);
+    border-left: 1px solid var(--border-color);
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column; /* Stack header, welcome/chat, and input vertically */
+    padding: 20px;
+    overflow: hidden; /* Prevent main scrollbar */
+    transition: margin 0.4s ease;
+    position: relative; /* For absolute positioning of welcomeScreen */
+}
+
+body.main-sidebar-collapsed.history-sidebar-collapsed .main {
+    margin: 0 auto;
+    max-width: 800px; /* Limits content width when sidebars are collapsed */
+    width: 100%;
+}
+/* SIDE BAR ENDS */
+
+/* === [HEADER - STARTS] ===  */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    transition: border-color 0.4s ease;
+    flex-shrink: 0; /* Prevent header from shrinking */
+    z-index: 3; /* Ensure header is above welcome screen */
+}
+
+.header .title {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.header .actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header .actions a {
+    text-decoration: none;
+    padding: 8px 16px;
+    background: var(--button-bg);
+    color: white;
+    border-radius: 20px;
+    transition: background 0.3s ease;
+}
+
+.header .actions a:hover {
+    background: var(--button-hover-bg);
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+.theme-toggle:hover {
+    color: var(--user-msg-color);
+    transform: scale(1.1);
+}
+/* HEADER ENDS */
+
+/* === [WELCOME - STARTS] ===  */
+#welcomeScreen { /* This ID targets the container directly */
+    flex: 1; /* Take up available space for centering */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    text-align: center;
+    background-color: var(--welcome-bg); /* Transparent in both modes */
+    transition: background-color 0.4s ease;
+    padding: 20px; /* Add some padding */
+    position: absolute; /* Position absolutely to layer over chat interface */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Below header, above chat interface */
+}
+
+.welcome-content {
+    max-width: 600px;
+    animation: fadeIn 1s ease-out; /* Simple fade-in for the content */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.welcome-logo {
+    width: 80px; /* Adjust size as needed */
+    height: 80px;
+    background-color: var(--logo-bg); /* Match the image background */
+    border-radius: 25%; /* Match the image shape */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px;
+    font-size: 3em;
+    color: var(--logo-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative; /* For animation context */
+    overflow: hidden; /* Ensure anything spinning doesn't go outside */
+}
+.welcome-logo img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 25%;
+}
+body.dark-mode .welcome-logo {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-logo svg {
+    display: block; /* Remove extra space below SVG */
+}
+.spin-element {
+    animation: spin 1.5s linear infinite; /* Reduced from 4s to 1.5s for faster spin */
+    transform-origin: 50% 50%;
+    filter: brightness(1.2) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5)); /* Added for shininess */
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+.welcome-heading {
+    font-size: 2.2em;
+    font-weight: 600;
+    color: var(--welcome-heading-color);
+    margin-bottom: 10px;
+    transition: color 0.4s ease;
+}
+
+.animated-text-container {
+    font-size: 1.6em;
+    font-weight: 500;
+    color: var(--welcome-text-color);
+    min-height: 2em; /* Ensure space for text during animation */
+    margin-bottom: 25px;
+    transition: color 0.4s ease;
+}
+
+.typing-cursor {
+    display: inline-block;
+    margin-left: 2px;
+    animation: blink 0.7s infinite;
+    color: var(--welcome-text-color); /* Cursor color */
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.welcome-description {
+    font-size: 0.95em;
+    color: var(--welcome-text-color);
+    line-height: 1.6;
+    max-width: 450px;
+    margin: 0 auto;
+    transition: color 0.4s ease;
+}
+
+#chatInterface {
+    flex: 1; /* Allow chat interface to fill remaining space */
+    display: flex; /* Initially hidden, becomes flex on chat */
+    flex-direction: column;
+    overflow: hidden; /* Hide scrollbars unless chat-box overflows */
+    padding-top: 10px; /* Space below header */
+    padding-bottom: 10px; /* Space above input */
+    height: 100%; /* Take full height of main content area, minus header and input */
+    pointer-events: none; /* Allow clicks to pass through when hidden */
+}
+
+body.welcome-screen-active #chatInterface {
+    /* When welcome screen is active, ensure chat interface is beneath it */
+    display: flex; /* Keep it flex so chatbox can calculate height */
+    visibility: hidden; /* Hide content but maintain layout */
+}
+body:not(.welcome-screen-active) #chatInterface {
+    visibility: visible;
+    pointer-events: auto; /* Enable clicks when visible */
+}
+/* WELCOME ENDS */
+
+/* === [CHATBOX - STARTS] ===  */
+.chat-box {
+    background: var(--chat-bg); /* Use chat-bg variable */
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    flex: 1; /* Allows chat-box to fill available space */
+    overflow-y: auto;
+    width: 100%;
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+body.dark-mode .chat-box {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.chat-message-container {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.chat-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: white;
+    flex-shrink: 0;
+    margin-top: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    overflow: hidden; /* Ensure SVG doesn't overflow round avatar */
+}
+.chat-avatar svg {
+    width: 100%;
+    height: 100%;
+    display: block; /* Remove any default margins */
+}
+
+
+.user .chat-avatar {
+    background-color: var(--avatar-bg-user);
+    margin-left: 15px;
+}
+.bot .chat-avatar {
+    margin-right: 15px;
+}
+
+.message {
+    flex-grow: 1;
+    padding: 15px 20px;
+    border-radius: 18px;
+    line-height: 1.7;
+    font-size: 1.05em;
+    max-width: 85%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
+}
+body.dark-mode .message {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.user .message {
+    background: var(--user-msg-bg);
+    color: var(--user-msg-color);
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+    font-weight: normal;
+    font-size: 1.05em;
+}
+
+.bot .message {
+    background: var(--bot-msg-bg);
+    color: var(--bot-msg-color);
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
+}
+
+.bot b {
+    color: inherit;
+}
+
+.highlight {
+    background-color: var(--highlight-bg);
+    color: var(--highlight-color);
+    padding: 2px 5px;
+    border-radius: 44px;
+    font-weight: bold;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+/* CHAT BOT ENDS */
+
+/* === [OUTPUT BOX - STARTS] ===  */
+.tool-output-container {
+    background: var(--tool-bg);
+    color: var(--tool-text-color);
+    padding: 12px;
+    border-radius: 10px;
+    font-family: 'Courier New', monospace;
+    margin-top: 10px;
+    position: relative;
+    border: 1px solid var(--border-color);
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+body.dark-mode .tool-output-container {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.tool-output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--tool-header-border);
+    padding-bottom: 8px;
+    color: var(--text-color);
+    transition: border-color 0.4s ease, color 0.4s ease;
+}
+
+.tool-output-tabs button {
+    background: none;
+    border: none;
+    color: var(--tool-text-color);
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 5px;
+    transition: background 0.2s ease, color 0.2s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.9em;
+}
+
+.tool-output-tabs button.active {
+    background: var(--tool-tab-active-bg);
+    color: var(--button-bg);
+    font-weight: bold;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+}
+body.dark-mode .tool-output-tabs button.active {
+    color: var(--highlight-color);
+}
+
+.tool-output-tabs button:hover:not(.active) {
+    background: var(--tool-tab-hover-bg);
+}
+
+.tool-output-fullscreen-toggle {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1em;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.tool-output-fullscreen-toggle:hover {
+    background: var(--tool-fullscreen-toggle-hover);
+    transform: scale(1.1);
+}
+
+.tool-output-content {
+    display: none;
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    padding-top: 5px;
+    color: var(--tool-text-color);
+    transition: color 0.4s ease;
+}
+.tool-output-content.active {
+    display: block;
+}
+
+.tool-output-content.code-view pre {
+    color: var(--code-text-color);
+}
+.tool-output-content.output-view pre {
+    color: var(--output-text-color);
+}
+
+.tool-output-content pre {
+    margin: 0;
+    padding: 0;
+    font-family: inherit;
+    white-space: pre-wrap;
+    color: inherit;
+}
+
+.tool-output-content iframe {
+    width: 100%;
+    height: 280px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--iframe-bg);
+    transition: background-color 0.4s ease, border-color 0.4s ease;
+}
+
+.tool-output-container.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    border-radius: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-output-container.fullscreen .tool-output-content {
+    flex: 1;
+    max-height: none;
+}
+.tool-output-container.fullscreen .tool-output-content iframe {
+    height: 100%;
+}
+/* OUT BOX ENDS */
+
+/* === [INPUT - STARTS] ===  */
+#input-area {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    padding: 12px 18px;
+    background: var(--input-bg);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05), 0 0 0 1px var(--border-color);
+    width: calc(100% - 40px);
+    transition: background-color 0.4s ease, box-shadow 0.4s ease, transform 0.5s ease, width 0.5s ease, bottom 0.5s ease, left 0.5s ease, height 0.5s ease, border-radius 0.5s ease, padding 0.5s ease;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 700px;
+    z-index: 2;
+    flex-shrink: 0;
+}
+body.dark-mode #input-area {
+     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--border-color);
+}
+
+#input-area:focus-within {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05), 0 0 0 3px var(--input-border-focus);
+}
+
+#input-area.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    border-radius: 0;
+    padding: 20px;
+    transform: none;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+}
+body.dark-mode #input-area.fullscreen {
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+}
+
+#userInput {
+    flex: 1;
+    padding: 8px 0;
+    font-size: 1em;
+    font-weight: 2px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text-color);
+    font-family: sans-serif;
+    resize: none;
+    overflow-y: auto;
+    min-height: 24px;
+    max-height: 200px;
+    line-height: 1.5;
+    transition: height 0.2s ease-out;
+    margin-bottom: 8px;
+}
+
+#input-area.fullscreen #userInput {
+    max-height: none;
+    flex: 1;
+    font-size: 1.8em;
+}
+
+.input-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px solid transparent;
+    transition: border-color 0.4s ease;
+}
+
+.input-fullscreen-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--input-button-color);
+    font-size: 1em;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.input-fullscreen-toggle:hover {
+    background-color: var(--input-button-hover-bg);
+    color: var(--button-bg);
+    transform: scale(1.1);
+}
+#input-area.fullscreen .input-fullscreen-toggle {
+    top: 20px;
+    right: 20px;
+}
+
+
+.input-action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.input-action-button {
+    background: none;
+    border: none;
+    color: var(--input-button-color);
+    font-size: 1.2em;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: default;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+    position: relative;
+}
+
+.input-action-button:hover {
+    background-color: var(--input-button-hover-bg);
+    color: var(--button-bg);
+    transform: scale(1.1);
+    opacity: 0.7;
+}
+
+/*=== SETTING ICON, PROFILE PICTURE  AND MORE ===*/
+.tooltip {
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--tooltip-bg);
+    color: var(--tooltip-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8em;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.input-action-button:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: var(--button-bg);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--button-hover-bg);
+    transform: translateY(-2px);
+}
+
+body:not(.welcome-screen-active) .main {
+     position: static;
+}
+body:not(.welcome-screen-active) #input-area {
+    position: static;
+    transform: translateX(0);
+    max-width: none;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.auth-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+.auth-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-color);
+}
+.auth-box {
+  position: relative;
+}
+
+.auth-box {
+  background: var(--sidebar-bg);
+  padding: 30px 20px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  color: var(--text-color);
+}
+
+.auth-box h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.9em;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-color);
+}
+
+.toggle-auth, .forgot-pass {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.toggle-auth a, .forgot-pass a {
+  color: var(--button-bg);
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.sidebar-details-container {
+    padding: 10px 0 10px 20px;
+    margin-left: 20px;
+    border-left: 2px solid var(--border-color);
+    margin-top: 5px;
+    margin-bottom: 5px;
+    background-color: var(--sidebar-hover-bg);
+    border-radius: 5px;
+    font-size: 0.9em;
+    color: var(--text-color);
+    transition: background-color 0.3s ease;
+}
+
+.profile-info, .settings-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.profile-picture {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 5px;
+    border: 2px solid var(--button-bg);
+}
+
+.profile-name {
+    font-weight: bold;
+    color: var(--welcome-heading-color);
+    margin: 0;
+}
+
+.profile-email, .profile-plan {
+    margin: 0;
+    font-size: 0.85em;
+    color: var(--welcome-text-color);
+}
+
+.settings-options p {
+    margin: 0;
+    color: var(--welcome-text-color);
+}
+
+.settings-options a {
+    color: var(--button-bg);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.settings-options a:hover {
+    text-decoration: underline;
+    color: var(--button-hover-bg);
+}
+
+.main-sidebar nav ul li {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.main-sidebar nav ul li a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+/* === Custom Selection Color === */
+::selection {
+  background-color: #6ab1a3; 
+  color: white;
+}
+
+/* For Firefox */
+::-moz-selection {
+  background-color: #6ab1a3;
+  color: white;
+}
+
+/* === Copy Button Styling === */
+.tool-output-copy-button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 1em;
+  padding: 5px; /* Same as fullscreen */
+  border-radius: 5px;
+  transition: background 0.2s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.tool-output-copy-button:hover {
+  background: rgba(100, 100, 255, 0.1); /* Subtle light hover effect */
+  transform: scale(1.1);
+}
+
+
+.tool-output-copy-button::after {
+  /* content: "Copy Code"; */
+  position: absolute;
+  top: -30px;
+  right: 0;
+  background-color: #222;
+  color: #fff;
+  font-size: 0.75em;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(5px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 999;
+}
+
+.tool-output-copy-button:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+
+
+.tool-output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tool-output-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tool-output-fullscreen-toggle,
+.tool-output-copy-button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 1em;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  transition: background 0.2s ease, transform 0.2s ease;
+  margin-left: 5px;
+}
+
+.tool-output-fullscreen-toggle:hover,
+.tool-output-copy-button:hover {
+  background: var(--tool-fullscreen-toggle-hover);
+  transform: scale(1.1);
+}
+
+.message-timestamp {
+  font-size: 0.75em;
+  color: var(--timestamp-color, #888);
+  margin-top: 4px;
+  margin-left: 500px; /* align under Brian’s message bubble */
+}
+body.dark-mode .message-timestamp {
+  color: #aaa;
+}
+
+.chat-history-list {
+  padding: 0;
+  margin: 10px 0 0 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.chat-history-item {
+  background: var(--bg-secondary, #f3f3f3);
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.chat-history-item:hover {
+  background: var(--hover-color, #e0e0e0);
+}
+
+.chat-history-item .delete-chat-btn {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: #999;
+}
+
+.chat-history-item .delete-chat-btn:hover {
+  color: red;
+}
+
+.notification-box {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #f44336; /* Red */
+  color: white;
+  padding: 16px 24px;
+  border-radius: 6px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification-box .close-btn {
+  cursor: pointer;
+  font-weight: bold;
+}
+.hidden-tab-content {
+    display: none !important;
+}
+
+/* Add to your CSS */
+#todayHistoryList[data-loading="true"] {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+#newChatContainer {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+#newChatBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: none;
+  background-color: #3f51b5;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  width: 100%;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+#newChatBtn i {
+  font-size: 14px;
+}
+
+/*Hide text and turn into circle when sidebar is collapsed */
+.history-sidebar-collapsed #newChatBtn .btn-text {
+  display: none;
+}
+
+.history-sidebar-collapsed #newChatBtn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* Fixed Sidebar Behavior for All Screens */
+.sidebar-base {
+    transition: transform 0.3s ease, width 0.3s ease; /* Smoother transitions */
+    will-change: transform; /* Prevent rendering issues */
+}
+

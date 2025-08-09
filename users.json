@@ -1,0 +1,92 @@
+{
+    "users": [
+        {
+            "name": "Abdul Wasiq",
+            "email": "abdulwasiq318@gmail.com",
+            "password": "wasiq@5024",
+            "plan": "Free",
+            "settings": {
+                "theme": "light",
+                "language": "English",
+                "voice": "Male"
+            }
+        },
+        {
+            "name": "Abdul Wasiq",
+            "email": "abdulwasiq651@gmail.com",
+            "password": "wasiq@5024",
+            "plan": "Free",
+            "settings": {
+                "language": "English",
+                "theme": "light",
+                "voice": "Male"
+            }
+        },
+        {
+            "name": "Abdul Wajid",
+            "email": "abdulwasiq5024@gmail.com",
+            "password": "wasiq@5024",
+            "plan": "Free",
+            "settings": {
+                "theme": "dark",
+                "language": "English",
+                "voice": "Male"
+            }
+        },
+        {
+            "name": "Majid",
+            "email": "wasiq@gmail.com",
+            "password": "wasiq@5024",
+            "plan": "Free",
+            "settings": {
+                "theme": "light",
+                "language": "English",
+                "voice": "Male"
+            }
+        },
+        {
+            "name": "Sarfaraz Ahmed",
+            "email": "sarfaraz123@gmail.com",
+            "password": "wasiq@5024",
+            "plan": "Free",
+            "settings": {
+                "theme": "light",
+                "language": "English",
+                "voice": "Male"
+            }
+        },
+        {
+            "name": "Abdul Wajid",
+            "email": "wajid@gmail.com",
+            "password": "wasiq@5024",
+            "plan": "Free",
+            "settings": {
+                "theme": "light",
+                "language": "English",
+                "voice": "Male"
+            }
+        },
+        {
+            "name": "Abdul Majid",
+            "email": "majid@gmail.com",
+            "password": "wasiq@5024",
+            "plan": "Free",
+            "settings": {
+                "theme": "light",
+                "language": "English",
+                "voice": "Male"
+            }
+        },
+        {
+            "name": "Abdul Wasiq1",
+            "email": "meow@gmail.com",
+            "password": "wasiq@5024@",
+            "plan": "Free",
+            "settings": {
+                "theme": "light",
+                "language": "English",
+                "voice": "Male"
+            }
+        }
+    ]
+}

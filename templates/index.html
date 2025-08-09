@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Brian AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<!-- Firebase App (Compat SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<!-- Firebase Auth (Compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<!-- Firebase Firestore (Compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5">
+<script>
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAA0J2xf943em6DksusYtxrZOd2c8VqRoI",
+    authDomain: "brianai-7489e.firebaseapp.com",
+    projectId: "brianai-7489e",
+    storageBucket: "brianai-7489e.appspot.com",
+    messagingSenderId: "837338740659",
+    appId: "1:837338740659:web:f33a3680f431ecbacffdc6",
+    measurementId: "G-KR1M3775WW"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  function checkEmailVerification(user) {
+    if (user.emailVerified) {
+      document.getElementById("verificationStatus").style.display = "block";
+      document.getElementById("resendVerificationContainer").style.display = "none";
+    } else {
+      document.getElementById("resendVerificationContainer").style.display = "block";
+    }
+  }
+
+  // Set up auth state listener
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      console.log("User logged in:", user.email);
+      checkEmailVerification(user);
+    } else {
+      console.log("No user logged in");
+      checkEmailVerification(user);
+    }
+  });
+</script>
+
+<body>
+    <!-- === [LOGIN/SIGN UP POP-UP - STARTING] === -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-box">
+            <span class="auth-close" onclick="closeAuthModal()">×</span>
+            <h2 id="authTitle">Login</h2>
+
+            <div class="input-group" id="nameGroup" style="display: none;">
+                <label>Name</label>
+                <input type="text" id="authName" placeholder="Your Name">
+            </div>
+
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="authEmail" placeholder="you@example.com">
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="authPassword" placeholder="••••••••">
+            </div>
+
+            <button onclick="submitAuth()">Continue</button>
+
+            <p class="toggle-auth">
+                <a href="#" onclick="toggleAuthMode()">Don't have an account? Create one</a>
+            </p>
+            <p class="forgot-pass" id="forgotText">
+                <a href="#">Forgot password?</a>
+            </p>
+
+            <!-- Add this inside your auth-box div -->
+           <div id="resendVerificationContainer" style="display: none; margin-top: 15px;">
+            <p style="font-size: 0.9em; margin-bottom: 8px;">Didn't get the email?</p>
+            <button onclick="resendVerification()" style="width: 100%; padding: 8px; font-size: 0.9em;">
+            <i class="fas fa-redo"></i> Resend Verification
+            </button>
+           </div>
+<div id="verificationStatus" style="display: none; margin-top: 10px; font-size: 0.9em;">
+  <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+  <span>Email verified!</span>
+</div>
+        </div>
+    </div>
+<!-- === [LOGIN/SIGN UP POP-UP - ENDING] === -->
+
+<!-- === [NOTIFICATION BOX - REUSABLE] === -->
+<div id="notificationBox" class="notification-box" style="display: none;">
+  <span id="notificationMessage"></span>
+  <span class="close-btn" onclick="hideNotification()">&times;</span>
+</div>
+
+
+<!-- === [LEFT SIDE BAR - STARTING] === -->
+    <div class="main-sidebar sidebar-base" id="mainSidebar" onmouseenter="handleSidebarHover(this, true)" onmouseleave="handleSidebarHover(this, false)">
+        <div>
+            <h3>
+                <span class="sidebar-title-text">Brian AI</span>
+                <span class="toggle-icon" onclick="toggleSidebar(document.getElementById('mainSidebar'))">                    <i class="fas fa-times"></i>
+                    <i class="fas fa-bars"></i>
+                </span>
+            </h3>
+            <nav>
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> <span>Home</span></a></li>
+
+                    <li>
+                        <a href="#" id="profileLink" onclick="toggleSidebarSection('profile'); return false;"><i class="fas fa-user"></i> <span>Profile</span></a>
+                        <div id="profileDetailsContainer" class="sidebar-details-container sidebar-panel" style="display: none;">
+                            <div class="profile-info">
+                                <img src="https://via.placeholder.com/60" alt="Profile Picture" class="profile-picture">
+                                <p class="profile-name" id="profileName">Abdul Wasiq</p>
+                                <p class="profile-email" id="profileEmail">email@example.com</p>
+                                <p class="profile-plan" id="profilePlan">Free</p>
+                            </div>
+
+                            <div class="verification-status" id="profileVerificationStatus" style="margin-top: 10px;">
+  <i class="fas fa-check-circle verified-icon" style="display: none; color: #4CAF50;"></i>
+  <i class="fas fa-exclamation-circle unverified-icon" style="display: none; color: #FFC107;"></i>
+  <span class="verification-text" style="font-size: 0.9em;"></span>
+</div>
+                        </div>
+                    </li>
+
+                    <li><a href="#" id="aboutUsLink" onclick="toggleSidebarSection('about'); return false;"><i class="fas fa-book"></i> <span>About us</span></a></li>
+
+                    <li>
+                        <a href="#" id="settingsLink" onclick="toggleSidebarSection('settings'); return false;"><i class="fas fa-cog"></i> <span>Settings</span></a>
+                        <div id="settingsDetailsContainer" class="sidebar-details-container sidebar-panel" style="display: none;">
+                            <div class="settings-options">
+                                <p>Theme: <span id="settingsTheme">Light</span></p>
+                                <p>Language: <span id="settingsLanguage">English</span></p>
+                                <p>Voice Assistance: <span id="settingsVoice">FeMale</span></p>
+                                <div>
+  <button class="theme-toggle" type="button" onclick="toggleTheme()">
+    <i class="fas fa-sun" id="sun-icon"></i>
+    <i class="fas fa-moon" id="moon-icon" style="display: none;"></i>
+  </button>
+</div>
+
+                                <p><a href="#">Report issue here</a></p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div>
+            <a href="#" id="logoutBtn" class="logout">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </a>
+        </div>
+    </div>
+<!-- === [LEFT SIDE BAR - ENDING] === -->
+
+<!-- === [BODY - STARTING] === -->
+    <div class="main">
+        <div class="header">
+    <button class="mobile-menu-toggle" onclick="toggleSidebar(document.getElementById('mainSidebar'))">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="title">Brian AI</div>
+    <div class="actions">
+        <a href="#" onclick="openAuthModal()">Login</a>
+    </div>
+       </div>
+        <div id="welcomeScreen">
+            <div class="welcome-content">
+                <div class="welcome-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="80" height="80">
+                        <defs>
+                            <linearGradient id="gradientActive" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#3f51b5;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#a0c4ff;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path class="spin-element" fill="url(#gradientActive)" d="M50,10 C27.9,10 10,27.9 10,50 C10,72.1 27.9,90 50,90 C72.1,90 90,72.1 90,50 C90,27.9 72.1,10 50,10 Z M50,14 C69.9,14 86,30.1 86,50 C86,69.9 69.9,86 50,86 C30.1,86 14,69.9 14,50 C14,30.1 30.1,14 50,14 Z"/>
+                        <path fill="var(--logo-color)" d="M50 40 L65 50 L50 60 L35 50 Z" />
+                    </svg>
+                </div>
+                <h1 class="welcome-heading" id="greeting">Hi there!</h1>
+                <h2 class="animated-text-container">
+                    <span id="animatedText"></span>
+                    <span class="typing-cursor">|</span>
+                </h2>
+                <p class="welcome-description">
+                    Ready to assist you with anything you need? From answering questions, generation to providing recommendations. Let's get started!
+                </p>
+            </div>
+        </div>
+<!-- === [BODY - ENDING] === -->
+
+<!-- === [INPUT BOX - STARTING] === -->
+        <div id="chatInterface" style="display: none;"> <!--Chat box-->
+            <div class="chat-box" id="chat">
+            </div>
+        </div>
+
+        <div id="input-area">
+            <button class="input-fullscreen-toggle" onclick="toggleInputFullscreen()">
+                <i class="fas fa-expand-alt" id="fullscreen-icon"></i>
+            </button>
+            <textarea id="userInput" placeholder="Ask me anything..." rows="1"></textarea>
+            <div class="input-actions-row">
+                <div class="input-action-buttons">
+                    <button class="input-action-button">
+                        <i class="fas fa-video"></i>
+                        <span class="tooltip">Live Video Call Coming Soon!</span>
+                    </button>
+                    <button class="input-action-button">
+                        <i class="fas fa-desktop"></i>
+                        <span class="tooltip">Screen Sharing Coming Soon!</span>
+                    </button>
+                    <button class="input-action-button">
+                        <i class="fas fa-microphone"></i>
+                        <span class="tooltip">Voice Input Coming Soon!</span>
+                    </button>
+                </div>
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+<!-- === [INPUT BOX - ENDING] === -->
+
+<!-- === [RIGHT SIDE BAR(Chat History) - STARTING] === -->
+   <div class="history-sidebar sidebar-base" id="historySidebar"
+        onmouseenter="handleSidebarHover(this, true)"
+        onmouseleave="handleSidebarHover(this, false)">
+    <div>
+        <h3>
+            <span class="sidebar-title-text">History</span>
+            <span class="toggle-icon" onclick="toggleSidebar(document.getElementById('historySidebar'))">
+                <i class="fas fa-times"></i>
+                <i class="fas fa-bars"></i>
+            </span>
+        </h3>
+        <nav>
+            <ul>
+                <li><a href="#" id="todayTab"><i class="fas fa-history"></i> <span>Today</span></a></li>
+                <li><a href="#"><i class="fas fa-calendar-alt"></i> <span>Last Week</span></a></li>
+                <li><a href="#"><i class="fas fa-star"></i> <span>Favorites</span></a></li>
+                <li><a href="#"><i class="fas fa-ellipsis-h"></i> <span>More</span></a></li>
+                <li id="newChatContainer">
+                    <button id="newChatBtn" onclick="startNewChat()">
+                        <i class="fas fa-plus"></i>
+                        <span class="btn-text">New Chat</span>
+                    </button>
+                </li>
+            </ul>
+            <div id="todayHistoryList" class="chat-history-list" style="margin-top: 10px;"></div>
+        </nav>
+    </div>
+    <div>
+        <a href="#" class="logout"><i class="fas fa-trash-alt"></i> <span>Clear History</span></a>
+    </div>
+</div>
+<!-- === [RIGHT SIDE BAR - ENDING] === -->
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/static/js/main.js"></script>
+</body>
+</html>
