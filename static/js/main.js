@@ -64,6 +64,10 @@ function toggleSidebarSection(sectionId) {
   // Note: Removed today tab handling from here - it's handled in the click handler
 }
 
+function toggleSidebar(sidebarElement) {
+    sidebarElement.classList.toggle("sidebar-active");
+}
+
 
 async function loadTodayChats() {
   const historyList = document.getElementById('todayHistoryList');
