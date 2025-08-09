@@ -13,7 +13,7 @@ window.resendVerification = resendVerification;
 let currentSessionId = localStorage.getItem("currentSessionId");
 
 // --- New Sidebar Section Toggling Logic ---
-// === [SIDEBAR SECTION TOGGLING] ===
+// === [SIDEBAR SECTION TOGGLING] === 
 let activeSidebarSection = null;
 
 // const isMobile = () => window.innerWidth <= 768;
@@ -731,7 +731,7 @@ async function sendMessage() {
     };
 
     // 7) Call Flask /chat endpoint
-    const response = await fetch("http://127.0.0.1:5000/chat", {
+    const response = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -1352,7 +1352,7 @@ async function loadChatSession(sessionId) {
 
 async function startNewChat() {
   // 0) Tell your Flask backend to drop all prior messages except the system prompt
-  await fetch("http://127.0.0.1:5000/reset-context", { method: "POST" });
+  await fetch("/reset-context", { method: "POST" });
 
   // 1) Clear out session data
   localStorage.removeItem("currentSessionId");
