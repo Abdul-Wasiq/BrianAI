@@ -502,6 +502,11 @@ function toggleSidebar(sidebarElement) {
     }
 }
 
+function toggleSidebar(sidebarElement) {
+    if (!sidebarElement) return;
+    sidebarElement.classList.toggle("sidebar-active");
+}
+
 
 
   // Updated handleSidebarHover function
