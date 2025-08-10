@@ -560,23 +560,17 @@ body.dark-mode .chat-box {
 
 
 .user .chat-avatar {
-    background-color: var(--avatar-bg-user);
-    margin-left: 15px;
-}
+        margin-left: 8px; /* Reduced from 10px */
+        margin-right: 0;
+    }
 .bot .chat-avatar {
     margin-right: 15px;
 }
 
 .message {
-    flex-grow: 1;
-    padding: 15px 20px;
-    border-radius: 18px;
-    line-height: 1.7;
-    font-size: 1.05em;
-    max-width: 85%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
-}
+        max-width: calc(95% - 46px); /* Increased from 85% to 95% */
+        min-width: 70%; /* Added to prevent too narrow bubbles */
+    }
 body.dark-mode .message {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
@@ -591,11 +585,10 @@ body.dark-mode .message {
 }
 
 .bot .message {
-    background: var(--bot-msg-bg);
-    color: var(--bot-msg-color);
-    margin-right: auto;
-    border-bottom-left-radius: 4px;
-}
+        margin-right: auto;
+        margin-left: 5px; /* Small left margin */
+        width: auto; /* Allow natural width */
+    }
 
 .bot b {
     color: inherit;
@@ -1407,8 +1400,7 @@ body.dark-mode .message-timestamp {
     
     .user .message {
         margin-left: auto;
-        margin-right: 0;
-        border-bottom-right-radius: 4px;
+        margin-right: 5px; /* Small right margin */
     }
 
     .bot {
@@ -1441,9 +1433,8 @@ body.dark-mode .message-timestamp {
     }
 
     .bot .chat-avatar {
-        margin-right: 10px; /* Adjust spacing as needed */
+        margin-right: 8px; /* Reduced from 10px */
         margin-left: 0;
-        order: 1; /* This will make the avatar appear first */
     }
 
     /* Fixed bottom input area */
