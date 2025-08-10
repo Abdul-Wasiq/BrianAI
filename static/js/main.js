@@ -463,24 +463,26 @@ const mobile = isMobile(); // Make sure isMobile() is properly defined
 function toggleSidebar(sidebarElement) {
     if (!sidebarElement) return;
     
-    // Mobile behavior
-    if (isMobile()) {
-        const isOpening = !sidebarElement.classList.contains('sidebar-active');
-        const overlay = document.querySelector('.sidebar-overlay');
+    const isOpening = !sidebarElement.classList.contains('sidebar-active');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    // Close all sidebars first
+    document.querySelectorAll('.sidebar-base').forEach(sidebar => {
+        sidebar.classList.remove('sidebar-active');
+    });
+    
+    // Toggle the clicked sidebar
+    if (isOpening) {
+        sidebarElement.classList.add('sidebar-active');
+        if (overlay) overlay.style.display = 'block';
         
-        // Close all sidebars first
-        document.querySelectorAll('.sidebar-base').forEach(sidebar => {
-            sidebar.classList.remove('sidebar-active');
+        // Add this to prevent text from disappearing
+        sidebarElement.addEventListener('mouseleave', function onMouseLeave() {
+            // Keep text visible even when mouse leaves
+            sidebarElement.removeEventListener('mouseleave', onMouseLeave);
         });
-        
-        // Toggle the clicked sidebar
-        if (isOpening) {
-            sidebarElement.classList.add('sidebar-active');
-            if (overlay) overlay.style.display = 'block';
-        } else {
-            if (overlay) overlay.style.display = 'none';
-        }
-        return;
+    } else {
+        if (overlay) overlay.style.display = 'none';
     }
     
     // Desktop behavior

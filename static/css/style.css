@@ -1350,6 +1350,7 @@ body.dark-mode .message-timestamp {
     .sidebar-base li {
         display: flex;
         align-items: center;
+        padding: 10px 15px;
         white-space: nowrap;
     }
 
@@ -1357,17 +1358,26 @@ body.dark-mode .message-timestamp {
         display: flex;
         align-items: center;
         width: 100%;
+        gap: 12px; /* Space between icon and text */
+    }
+
+    .sidebar-base li i {
+        flex-shrink: 0;
+        width: 24px; /* Fixed width for icons */
+        text-align: center;
     }
 
     .sidebar-base li span {
-        display: none;
-        margin-left: 10px;
+        display: none; /* Hidden by default */
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     /* When sidebar is active or hovered */
     .sidebar-base.sidebar-active li span {
-        display: inline-block;
-        animation: fadeIn 0.3s ease;
+        display: inline-block; /* Show when sidebar is active */
+        animation: fadeIn 0.2s ease;
     }
     .sidebar-base:hover li span {
         display: none;
