@@ -1370,6 +1370,7 @@ body.dark-mode .message-timestamp {
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        margin-top: 200px;
     }
     
     /* Chat bubble spacing and width adjustments */
