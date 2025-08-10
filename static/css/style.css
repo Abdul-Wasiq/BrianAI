@@ -1279,7 +1279,7 @@ body.dark-mode .message-timestamp {
     will-change: transform; /* Prevent rendering issues */
 }
 
-/* ===== Mobile Responsive Fixes (Final and Corrected) ===== */
+/* ===== Mobile Responsive Fixes (Final and Polished) ===== */
 @media screen and (max-width: 768px) {
     /* Main body layout for mobile */
     body {
@@ -1318,7 +1318,7 @@ body.dark-mode .message-timestamp {
     /* Correctly defined sidebars as full-screen overlays */
     #mainSidebar,
     #historySidebar {
-        display: none; /* Hide sidebars by default */
+        display: none;
         position: fixed;
         top: 0;
         bottom: 0;
@@ -1331,12 +1331,12 @@ body.dark-mode .message-timestamp {
     }
     
     #mainSidebar.sidebar-active {
-        display: flex; /* Only show when this class is added */
+        display: flex;
         left: 0;
     }
     
     #historySidebar.sidebar-active {
-        display: flex; /* Only show when this class is added */
+        display: flex;
         right: 0;
     }
 
@@ -1359,8 +1359,11 @@ body.dark-mode .message-timestamp {
         -webkit-overflow-scrolling: touch;
         padding: 10px;
         padding-top: 0;
+        /* Aligns chat bubbles from the bottom of the container */
+        justify-content: flex-end; 
     }
 
+    /* Welcome screen is now vertically centered with flexbox */
     #welcomeScreen {
         flex: 1;
         width: 100%;
@@ -1370,7 +1373,8 @@ body.dark-mode .message-timestamp {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        margin-top: 150px;
+        /* Remove fixed margin */
+        margin-top: 0; 
     }
     
     /* Chat bubble spacing and width adjustments */
@@ -1397,6 +1401,7 @@ body.dark-mode .message-timestamp {
         border-radius: 18px;
         line-height: 1.6;
         font-size: 1em;
+        /* Adjusted width for better fit on mobile screens */
         max-width: 85%;
     }
 
