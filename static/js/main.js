@@ -459,24 +459,31 @@ function isMobile() {
 const mobile = isMobile(); // Make sure isMobile() is properly defined
 
 // Updated toggleSidebar function
+// Unified toggleSidebar function
 function toggleSidebar(sidebarElement) {
-    // Mobile logic
+    if (!sidebarElement) return;
+    
+    // Mobile behavior
     if (isMobile()) {
-        const isOpening = !sidebarElement.classList.contains('mobile-expanded');
+        const isOpening = !sidebarElement.classList.contains('sidebar-active');
+        const overlay = document.querySelector('.sidebar-overlay');
         
         // Close all sidebars first
         document.querySelectorAll('.sidebar-base').forEach(sidebar => {
-            sidebar.classList.remove('mobile-expanded');
+            sidebar.classList.remove('sidebar-active');
         });
         
-        // Toggle the clicked sidebar if it was closed
+        // Toggle the clicked sidebar
         if (isOpening) {
-            sidebarElement.classList.add('mobile-expanded');
+            sidebarElement.classList.add('sidebar-active');
+            if (overlay) overlay.style.display = 'block';
+        } else {
+            if (overlay) overlay.style.display = 'none';
         }
-        return; // Exit the function to prevent desktop logic from running
+        return;
     }
     
-    // Desktop logic
+    // Desktop behavior
     const isExpanding = !sidebarElement.classList.contains('expanded');
     
     // Toggle sidebar state
@@ -503,10 +510,80 @@ function toggleSidebar(sidebarElement) {
     }
 }
 
-function toggleSidebar(sidebarElement) {
-    if (!sidebarElement) return;
-    sidebarElement.classList.toggle("sidebar-active");
+// Initialize overlay (put this in your DOMContentLoaded event)
+function initSidebarOverlay() {
+    const overlay = document.createElement('div');
+    overlay.className = 'sidebar-overlay';
+    document.body.appendChild(overlay);
+    
+    overlay.addEventListener('click', function() {
+        document.querySelectorAll('.sidebar-base.sidebar-active').forEach(sidebar => {
+            sidebar.classList.remove('sidebar-active');
+        });
+        overlay.style.display = 'none';
+    });
+    
+    document.addEventListener('click', function(e) {
+        const isSidebar = e.target.closest('.sidebar-base');
+        const isHamburger = e.target.closest('.hamburger-left, .hamburger-right');
+        
+        if (!isSidebar && !isHamburger) {
+            document.querySelectorAll('.sidebar-base.sidebar-active').forEach(sidebar => {
+                sidebar.classList.remove('sidebar-active');
+            });
+            overlay.style.display = 'none';
+        }
+    });
 }
+
+
+// Add to your main.js or script section
+document.addEventListener('DOMContentLoaded', function() {
+  initSidebarOverlay();
+    // Create overlay element
+    const overlay = document.createElement('div');
+    overlay.className = 'sidebar-overlay';
+    document.body.appendChild(overlay);
+    
+    // Close sidebar when clicking overlay
+    overlay.addEventListener('click', function() {
+        document.querySelectorAll('.sidebar-base.sidebar-active').forEach(sidebar => {
+            sidebar.classList.remove('sidebar-active');
+        });
+        overlay.style.display = 'none';
+    });
+    
+    // Close sidebar when clicking anywhere else
+    document.addEventListener('click', function(e) {
+        const isSidebar = e.target.closest('.sidebar-base');
+        const isHamburger = e.target.closest('.hamburger-left, .hamburger-right');
+        
+        if (!isSidebar && !isHamburger) {
+            document.querySelectorAll('.sidebar-base.sidebar-active').forEach(sidebar => {
+                sidebar.classList.remove('sidebar-active');
+            });
+            overlay.style.display = 'none';
+        }
+    });
+    
+    // Update your toggleSidebar function to handle overlay
+    function toggleSidebar(sidebar) {
+        const isActive = sidebar.classList.contains('sidebar-active');
+        
+        // Close all sidebars first
+        document.querySelectorAll('.sidebar-base').forEach(s => {
+            s.classList.remove('sidebar-active');
+        });
+        
+        // Toggle the clicked sidebar
+        if (!isActive) {
+            sidebar.classList.add('sidebar-active');
+            overlay.style.display = 'block';
+        } else {
+            overlay.style.display = 'none';
+        }
+    }
+});
 
 
 

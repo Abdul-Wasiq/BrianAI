@@ -1346,10 +1346,51 @@ body.dark-mode .message-timestamp {
         box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
         flex-direction: column;
     }
-    .bot.chat-message-container {
-    flex-direction: row-reverse; 
-    justify-content: flex-start; 
-} 
+    /* Default mobile state - icons only */
+    .sidebar-base li {
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+    }
+
+    .sidebar-base li a {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .sidebar-base li span {
+        display: none;
+        margin-left: 10px;
+    }
+    
+    /* When sidebar is active or hovered */
+    .sidebar-base.sidebar-active li span {
+        display: inline-block;
+        animation: fadeIn 0.3s ease;
+    }
+    .sidebar-base:hover li span {
+        display: none;
+    }
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 9998;
+        display: none;
+    }
+    .sidebar-active ~ .sidebar-overlay {
+        display: block;
+    }
+
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateX(-10px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
     #mainSidebar.sidebar-active {
         display: flex;
         left: 0;
