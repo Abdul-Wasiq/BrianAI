@@ -171,13 +171,14 @@
 <!-- === [BODY - STARTING] === -->
     <div class="main">
         <div class="header">
-            <button class="mobile-menu-toggle" onclick="toggleSidebar(document.getElementById('mainSidebar'))">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="title">Brian AI</div>
-            <button class="mobile-menu-toggle" onclick="toggleSidebar(document.getElementById('historySidebar'))">
-                <i class="fas fa-bars"></i>
-            </button>
+            <div class="hamburger-left" onclick="toggleSidebar(document.getElementById('mainSidebar'))">
+    <i class="fas fa-bars"></i>
+</div>
+<div class="title">Brian AI</div>
+<div class="hamburger-right" onclick="toggleSidebar(document.getElementById('historySidebar'))">
+    <i class="fas fa-bars"></i>
+</div>
+
         </div>
         <div id="welcomeScreen">
             <div class="welcome-content">

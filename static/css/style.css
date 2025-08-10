@@ -1280,8 +1280,8 @@ body.dark-mode .message-timestamp {
 }
 
 /* ===== Mobile Responsive Fixes (Final and Polished) ===== */
-/* @media screen and (max-width: 768px) {
-    /* Main body layout for mobile 
+@media screen and (max-width: 768px) {
+    
     body {
         height: 100vh;
         height: 100dvh;
@@ -1289,8 +1289,7 @@ body.dark-mode .message-timestamp {
         flex-direction: column;
         overflow: hidden;
     }
-    
-    /* Header - Fixed to the top 
+     
     .header {
         flex-shrink: 0;
         padding: 10px;
@@ -1309,17 +1308,18 @@ body.dark-mode .message-timestamp {
     }
     
     .hamburger-left, .hamburger-right {
-        display: inline-block;
-        cursor: pointer;
-        font-size: 22px;
-        padding: 6px;
-        color: var(--text-color);
-    }
+    display: inline-block;
+    cursor: pointer;
+    font-size: 22px;
+    padding: 6px;
+    color: var(--text-color);
+}
+
 
     .mobile-menu-toggle {
         display: none;
     }
-    /* Correctly defined sidebars as full-screen overlays 
+ 
     #mainSidebar,
     #historySidebar {
         display: none;
@@ -1333,7 +1333,7 @@ body.dark-mode .message-timestamp {
         box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
         flex-direction: column;
     }
-    /* .bot.chat-message-container {
+    .bot.chat-message-container {
     flex-direction: row-reverse; 
     justify-content: flex-start; 
 } 
@@ -1346,8 +1346,7 @@ body.dark-mode .message-timestamp {
         display: flex;
         right: 0;
     }
-
-    /* Main content area fills the available space 
+ 
     .main {
         flex: 1;
         display: flex;
@@ -1357,7 +1356,6 @@ body.dark-mode .message-timestamp {
         overflow: hidden;
     }
 
-    /* Chat and Welcome Screen container - fills the space and scrolls 
     #chatInterface {
         flex: 1;
         display: flex;
@@ -1369,7 +1367,6 @@ body.dark-mode .message-timestamp {
         justify-content: flex-end; 
     }
 
-    /* Welcome screen is now vertically centered with flexbox 
     #welcomeScreen {
     flex: 1;
     width: 100%;
@@ -1443,93 +1440,5 @@ body.dark-mode .message-timestamp {
         z-index: 100;
         flex-shrink: 0;
         box-sizing: border-box;
-    }
-}
-
-/* ===== Mobile Responsive Fixes (Final and Polished) ===== */
-@media screen and (max-width: 768px) {
-    /* ... your existing CSS for body and other elements ... */
-    
-    /* Header - Fixed to the top */
-    .header {
-        flex-shrink: 0;
-        padding: 10px;
-        border-bottom: 1px solid var(--border-color);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .header .title {
-        flex: 1;
-        text-align: center;
-        font-size: 20px;
-        font-weight: 600;
-    }
-    
-    .mobile-menu-toggle {
-        display: block; /* Show on mobile */
-        cursor: pointer;
-        font-size: 22px;
-        padding: 6px;
-        color: var(--text-color);
-        background: transparent;
-        border: none;
-    }
-
-    /* Hide the sidebar toggle icons on desktop */
-    .hamburger-left, .hamburger-right {
-        display: none;
-    }
-
-    /* Correctly defined sidebars as full-screen overlays */
-    #mainSidebar {
-        display: none;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0; /* Left side */
-        width: 250px;
-        background-color: var(--sidebar-bg, #fff);
-        z-index: 9999;
-        overflow-y: auto;
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-        flex-direction: column;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
-    }
-    
-    #historySidebar {
-        display: none;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        right: 0; /* Right side */
-        width: 250px;
-        background-color: var(--sidebar-bg, #fff);
-        z-index: 9999;
-        overflow-y: auto;
-        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
-        flex-direction: column;
-        transform: translateX(100%);
-        transition: transform 0.3s ease-in-out;
-    }
-
-    #mainSidebar.sidebar-active {
-        display: flex;
-        transform: translateX(0);
-    }
-    
-    #historySidebar.sidebar-active {
-        display: flex;
-        transform: translateX(0);
-    }
-
-    /* ... other mobile-specific styles ... */
-}
-
-/* Hide mobile toggle buttons on large screens */
-@media screen and (min-width: 769px) {
-    .mobile-menu-toggle {
-        display: none;
     }
 }
