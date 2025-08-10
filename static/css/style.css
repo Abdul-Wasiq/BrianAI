@@ -528,13 +528,18 @@ body.dark-mode .chat-box {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.chat-message-container {
-        margin-bottom: 15px;
+/* .chat-message-container {
+        /* margin-bottom: 15px;
         display: flex;
         flex-wrap: nowrap;
         width: 100%;
-        padding: 0 5px; /* Reduced side padding */
-    }
+        padding: 0 5px; 
+    } */
+     .bot.chat-message-container {
+    flex-direction: row-reverse; /* Avatar on right from screen perspective */
+    justify-content: flex-start; /* Keep message aligned correctly */
+}
+
 
 .chat-avatar {
     width: 36px;
@@ -1405,11 +1410,9 @@ body.dark-mode .message-timestamp {
         margin-right: 5px; /* Small right margin */
     }
 
-    .bot {
-        /* justify-content: flex-start;
-        align-items: flex-start;  */
-        flex-direction: row-reverse;
-    }
+    /* .bot { */
+        /* flex-direction: row-reverse;
+    } */
     
     .bot .message {
         max-width: calc(100% - 46px); /* Avatar space only */
@@ -1433,7 +1436,7 @@ body.dark-mode .message-timestamp {
          /* margin-right: 10px;
          margin-left: 0; 
          order: 1;  */
-         margin-left: 10px; /* Space between bubble and avatar */
+         margin-left: 10px;
          margin-right: 0;
     }
 
