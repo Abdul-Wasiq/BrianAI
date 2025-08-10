@@ -1262,7 +1262,7 @@ body.dark-mode .message-timestamp {
 
 /* ===== Mobile Responsive Fix ===== */
 @media screen and (max-width: 768px) {
-    /* Hide sidebars by default */
+    /* Hide sidebars by default and make them full-height overlays for mobile */
     #mainSidebar,
     #historySidebar {
         display: none;
@@ -1273,17 +1273,19 @@ body.dark-mode .message-timestamp {
         background-color: var(--sidebar-bg, #fff);
         z-index: 9999;
         overflow-y: auto;
-        box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
     }
 
-    /* Slide-in animations */
+    /* Slide-in animations for sidebars */
     #mainSidebar.sidebar-active {
         display: block;
         animation: slideInLeft 0.3s ease forwards;
+        left: 0;
     }
     #historySidebar.sidebar-active {
         display: block;
         animation: slideInRight 0.3s ease forwards;
+        right: 0;
     }
 
     @keyframes slideInLeft {
@@ -1295,7 +1297,7 @@ body.dark-mode .message-timestamp {
         to { transform: translateX(0); }
     }
 
-    /* Optional overlay when sidebar is open */
+    /* Overlay to dim the background when a sidebar is open */
     .sidebar-overlay {
         display: none;
         position: fixed;
@@ -1310,19 +1312,56 @@ body.dark-mode .message-timestamp {
         display: block;
     }
 
-    /* Full width chat area */
+    /* Full width chat area and mobile padding */
     .main {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        padding: 0 10px;
+        padding: 0 10px; /* Use smaller padding for mobile */
+        margin: 0; /* Clear any desktop centering */
+    }
+    body.main-sidebar-collapsed.history-sidebar-collapsed .main {
+        max-width: none;
+    }
+    
+    /* Ensure the chat box and welcome screen are full-width and fill the space */
+    .chat-box, #welcomeScreen, #input-area {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        box-sizing: border-box; /* Ensure padding is included in the width */
     }
 
-    /* Mobile buttons */
-    .hamburger-left,
-    .hamburger-right {
+    /* Adjust chat bubbles for mobile layout */
+    .chat-message-container {
+        flex-wrap: wrap; /* Allow avatar and message to wrap to a new line if needed */
+        margin-bottom: 15px; /* Adjust spacing between messages */
+    }
+    .user .message, .bot .message {
+        max-width: 85%; /* Let bubbles take up most of the width */
+        margin: 0 10px 0 10px; /* Adjust margins to give space from the edges */
+    }
+    .user .chat-avatar {
+        margin-left: 0; /* Remove right margin to align left */
+        order: 1; /* Keep avatar on the left */
+    }
+    .bot .chat-avatar {
+        margin-right: 0; /* Remove left margin to align left */
+        order: 1;
+    }
+    .user .message {
+        order: 2; /* Put the user message after the avatar */
+    }
+    .bot .message {
+        order: 2;
+    }
+
+    /* Mobile buttons in header */
+    .header {
+        padding: 10px 0;
+    }
+    .hamburger-left, .hamburger-right {
         display: inline-block;
         cursor: pointer;
         font-size: 22px;
         padding: 6px;
+        color: var(--text-color);
     }
 }
