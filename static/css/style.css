@@ -1394,11 +1394,7 @@ body.dark-mode .message-timestamp {
     }
 
     .message {
-        padding: 12px 18px;
-        border-radius: 18px;
-        line-height: 1.6;
-        font-size: 1em;
-        max-width: 85%;
+        max-width: calc(85% - 46px); /* 46px = avatar width (36px) + margin (10px) */
     }
     
     /* Specific styling for user and bot messages */
@@ -1416,12 +1412,20 @@ body.dark-mode .message-timestamp {
     .bot {
         justify-content: flex-start;
         align-items: flex-start;
+        flex-direction: row; /* Ensure horizontal layout */
     }
     
     .bot .message {
         margin-right: auto;
         margin-left: 0;
         border-bottom-left-radius: 4px;
+        order: 2; /* This will make the bubble appear after the avatar */
+    }
+
+    .bot .chat-avatar {
+        margin-right: 10px; /* Adjust spacing as needed */
+        margin-left: 0;
+        order: 1; /* This will make the avatar appear first */
     }
 
     /* Avatar styling with correct ordering */
@@ -1436,12 +1440,6 @@ body.dark-mode .message-timestamp {
         margin-left: 10px;
         margin-right: 0;
         order: 2;
-    }
-
-    .bot .chat-avatar {
-        margin-right: 5px;
-        margin-left: 0;
-        order: 1;
     }
 
     /* Fixed bottom input area */
