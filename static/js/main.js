@@ -65,6 +65,7 @@ function toggleSidebarSection(sectionId) {
 }
 
 function toggleSidebar(sidebarElement) {
+    if (!sidebarElement) return;
     sidebarElement.classList.toggle("sidebar-active");
 }
 
