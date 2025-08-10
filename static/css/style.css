@@ -1401,19 +1401,37 @@ body.dark-mode .message-timestamp {
     }
     
     .user .message {
-        margin-left: auto;
-        margin-right: 5px; /* Small right margin */
+        /* margin-left: auto;
+        margin-right: 5px; Small right margin */
+
+        background-color: #4a90e2; /* Nice blue shade, you can change */
+        color: #fff; /* White text for contrast */
+        border-radius: 12px;
     }
 
     .bot {
-        justify-content: flex-start;
-        align-items: flex-start;
-        flex-direction: row; /* Ensure horizontal layout */
+        /* justify-content: flex-start;
+        align-items: flex-start; */
+        flex-direction: row-reverse; /* Ensure horizontal layout */
     }
     
     .bot .message {
-        max-width: calc(100% - 46px); /* Avatar space only */
+        /* max-width: calc(100% - 46px); Avatar space only */
+        position: relative;
+        padding-bottom: 18px;
     }
+
+    .bot .timestamp {
+    position: absolute;
+    right: 8px;
+    bottom: 4px;
+    font-size: 0.75em;
+    color: rgba(255, 255, 255, 0.6); /* Light color for subtle look */
+    white-space: nowrap; /* Prevent wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Avoid horizontal scrolling */
+    max-width: 60px; /* Fit inside bubble */
+}
 
     /* Avatar styling with correct ordering */
     .chat-avatar {
@@ -1430,9 +1448,12 @@ body.dark-mode .message-timestamp {
     }
 
     .bot .chat-avatar {
-        margin-right: 10px; /* Adjust spacing as needed */
-        margin-left: 0;
-        order: 1; /* This will make the avatar appear first */
+         /* margin-right: 10px;
+         margin-left: 0; 
+         order: 1;  */
+         margin-left: 10px; /* Space between bubble and avatar */
+         margin-right: 0;
+
     }
 
     /* Fixed bottom input area */
