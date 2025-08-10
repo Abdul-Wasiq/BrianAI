@@ -1329,10 +1329,10 @@ body.dark-mode .message-timestamp {
         box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
         flex-direction: column;
     }
-    .bot.chat-message-container {
-    flex-direction: row-reverse; /* Avatar on screen right */
-    justify-content: flex-start; /* Keep bubble in correct place */
-}
+    /* .bot.chat-message-container {
+    flex-direction: row-reverse; 
+    justify-content: flex-start; 
+} */
     #mainSidebar.sidebar-active {
         display: flex;
         left: 0;
