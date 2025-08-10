@@ -1359,7 +1359,6 @@ body.dark-mode .message-timestamp {
         -webkit-overflow-scrolling: touch;
         padding: 10px;
         padding-top: 0;
-        /* Aligns chat bubbles from the bottom of the container */
         justify-content: flex-end; 
     }
 
@@ -1373,7 +1372,6 @@ body.dark-mode .message-timestamp {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        /* Remove fixed margin */
         margin-top: 0; 
     }
     
@@ -1389,7 +1387,6 @@ body.dark-mode .message-timestamp {
     
     .chat-message-container {
         margin-bottom: 15px;
-        align-items: flex-start;
         display: flex;
         flex-wrap: nowrap;
         width: 100%;
@@ -1401,23 +1398,33 @@ body.dark-mode .message-timestamp {
         border-radius: 18px;
         line-height: 1.6;
         font-size: 1em;
-        /* Adjusted width for better fit on mobile screens */
         max-width: 85%;
     }
-
+    
+    /* Specific styling for user and bot messages */
+    .user {
+        justify-content: flex-end;
+        align-items: flex-end;
+    }
+    
     .user .message {
         margin-left: auto;
         margin-right: 0;
         border-bottom-right-radius: 4px;
     }
 
+    .bot {
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+    
     .bot .message {
         margin-right: auto;
         margin-left: 0;
         border-bottom-left-radius: 4px;
     }
 
-    /* Avatar styling with correct ordering for bot messages */
+    /* Avatar styling with correct ordering */
     .chat-avatar {
         width: 36px;
         height: 36px;
@@ -1426,15 +1433,15 @@ body.dark-mode .message-timestamp {
     }
 
     .user .chat-avatar {
-        order: 2;
         margin-left: 10px;
         margin-right: 0;
+        order: 2;
     }
 
     .bot .chat-avatar {
-        order: 1; /* Place bot avatar to the left of the message */
-        margin-right: 10px;
+        margin-right: 5px;
         margin-left: 0;
+        order: 1;
     }
 
     /* Fixed bottom input area */
