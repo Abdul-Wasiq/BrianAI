@@ -53,19 +53,6 @@
 </script>
 
 <body>
-<div class="header">
-    <!-- Left sidebar toggle (for mobile) -->
-    <div class="hamburger-left" onclick="toggleSidebar(document.getElementById('mainSidebar'))">
-        <i class="fas fa-bars"></i>
-    </div>
-    
-    <div class="title">Brian AI</div>
-    
-    <!-- Right sidebar toggle (for mobile) -->
-    <div class="hamburger-right" onclick="toggleSidebar(document.getElementById('historySidebar'))">
-        <i class="fas fa-bars"></i>
-    </div>
-</div>
     <!-- === [LOGIN/SIGN UP POP-UP - STARTING] === -->
     <div id="authModal" class="auth-modal">
         <div class="auth-box">
@@ -184,11 +171,14 @@
 <!-- === [BODY - STARTING] === -->
     <div class="main">
         <div class="header">
-    <button class="mobile-menu-toggle" onclick="toggleSidebar(document.getElementById('mainSidebar'))">
-        <i class="fas fa-bars"></i>
-    </button>
-    <div class="title">Brian AI</div>
-       </div>
+            <button class="mobile-menu-toggle" onclick="toggleSidebar(document.getElementById('mainSidebar'))">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="title">Brian AI</div>
+            <button class="mobile-menu-toggle" onclick="toggleSidebar(document.getElementById('historySidebar'))">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
         <div id="welcomeScreen">
             <div class="welcome-content">
                 <div class="welcome-logo">
