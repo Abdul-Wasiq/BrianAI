@@ -1422,12 +1422,12 @@ body.dark-mode .message-timestamp {
     }
 
     /* Avatar styling with correct ordering */
-    .chat-avatar {
+    /* .chat-avatar {
         width: 36px;
         height: 36px;
         font-size: 0.9em;
         flex-shrink: 0;
-    }
+    } */
 
     .user .chat-avatar {
         margin-left: 10px;
@@ -1435,13 +1435,13 @@ body.dark-mode .message-timestamp {
         order: 2;
     }
 
-    .bot .chat-avatar {
+    /* .bot .chat-avatar {
          /* margin-right: 10px;
          margin-left: 0; 
-         order: 1;  */
-         margin-left: 10px; /* Space between bubble and avatar */
+         order: 1;  
+         margin-left: 10px; 
          margin-right: 0;
-    }
+    }  */
 
     /* Fixed bottom input area */
     #input-area {
