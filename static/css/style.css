@@ -1289,8 +1289,8 @@ body.dark-mode .message-timestamp {
         flex-direction: column;
         overflow: hidden;
     }
-
-    /* Header, Input, and Sidebars are correctly fixed */
+    
+    /* Header - Fixed to the top */
     .header {
         flex-shrink: 0;
         padding: 10px;
@@ -1306,25 +1306,41 @@ body.dark-mode .message-timestamp {
         font-size: 20px;
         font-weight: 600;
     }
-
-    #input-area {
+    
+    .hamburger-left, .hamburger-right {
+        display: inline-block;
+        cursor: pointer;
+        font-size: 22px;
+        padding: 6px;
+        color: var(--text-color);
+    }
+    
+    /* Correctly defined sidebars as full-screen overlays */
+    #mainSidebar,
+    #historySidebar {
+        display: none; /* Hide sidebars by default */
         position: fixed;
+        top: 0;
         bottom: 0;
+        width: 250px;
+        background-color: var(--sidebar-bg, #fff);
+        z-index: 9999;
+        overflow-y: auto;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+        flex-direction: column;
+    }
+    
+    #mainSidebar.sidebar-active {
+        display: flex; /* Only show when this class is added */
         left: 0;
-        width: 100%;
-        max-width: none;
-        padding: 12px 18px;
-        border-radius: 0;
-        border-top-left-radius: 16px;
-        border-top-right-radius: 16px;
-        transform: none;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        z-index: 100;
-        flex-shrink: 0;
-        box-sizing: border-box;
+    }
+    
+    #historySidebar.sidebar-active {
+        display: flex; /* Only show when this class is added */
+        right: 0;
     }
 
-    /* Main content area - The flexible container for chat and welcome screen */
+    /* Main content area fills the available space */
     .main {
         flex: 1;
         display: flex;
@@ -1334,7 +1350,7 @@ body.dark-mode .message-timestamp {
         overflow: hidden;
     }
 
-    /* Chat and Welcome Screen container - fills the space */
+    /* Chat and Welcome Screen container - fills the space and scrolls */
     #chatInterface {
         flex: 1;
         display: flex;
@@ -1342,27 +1358,30 @@ body.dark-mode .message-timestamp {
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         padding: 10px;
-        visibility: visible;
-        pointer-events: auto;
-        /* Adjust padding to remove the gap between body and input box */
-        padding-bottom: 80px; 
+        padding-top: 0;
     }
-    
+
     #welcomeScreen {
-        position: static;
         flex: 1;
         width: 100%;
         max-width: none;
         height: auto;
-        overflow-y: auto;
-        padding: 20px;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
     }
-
+    
     /* Chat bubble spacing and width adjustments */
+    .chat-box {
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+    }
+    
     .chat-message-container {
         margin-bottom: 15px;
         align-items: flex-start;
@@ -1377,7 +1396,6 @@ body.dark-mode .message-timestamp {
         border-radius: 18px;
         line-height: 1.6;
         font-size: 1em;
-        /* Increase max-width to make chat bubbles wider */
         max-width: 85%;
     }
 
@@ -1413,15 +1431,21 @@ body.dark-mode .message-timestamp {
         margin-left: 0;
     }
 
-    /* Timestamp Positioning */
-    .message-timestamp {
-        font-size: 0.75em;
-        color: var(--timestamp-color, #888);
-        margin-top: 4px;
-        margin-right: 10px;
-        margin-left: auto;
-        text-align: right;
+    /* Fixed bottom input area */
+    #input-area {
+        position: fixed;
+        bottom: 0;
+        left: 0;
         width: 100%;
-        padding-right: 10px;
+        max-width: none;
+        padding: 12px 18px;
+        border-radius: 0;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        transform: none;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        flex-shrink: 0;
+        box-sizing: border-box;
     }
 }
