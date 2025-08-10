@@ -1279,80 +1279,25 @@ body.dark-mode .message-timestamp {
     will-change: transform; /* Prevent rendering issues */
 }
 
-/* ===== Mobile Responsive Fixes (Corrected and Final) ===== */
+/* ===== Mobile Responsive Fixes (Final and Polished) ===== */
 @media screen and (max-width: 768px) {
     /* Main body layout for mobile */
     body {
         height: 100vh;
-        height: 100dvh; /* Use dynamic viewport height for better keyboard handling */
+        height: 100dvh;
         display: flex;
         flex-direction: column;
-        overflow: hidden; /* Prevents unwanted scrolling on the body */
-    }
-
-    /* Sidebars as full-screen overlays */
-    #mainSidebar,
-    #historySidebar {
-        display: none;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        width: 250px;
-        background-color: var(--sidebar-bg, #fff);
-        z-index: 9999;
-        overflow-y: auto;
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    #mainSidebar.sidebar-active {
-        display: flex;
-        left: 0;
-    }
-    
-    #historySidebar.sidebar-active {
-        display: flex;
-        right: 0;
-    }
-
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.4);
-        z-index: 9998;
-    }
-    
-    .sidebar-overlay.active {
-        display: block;
-    }
-
-    /* Main content area - flex container for the chat interface */
-    .main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        padding: 0 10px;
-        margin: 0;
-        overflow: hidden; /* Control scrolling within the chat box, not the main area */
-    }
-    
-    body.main-sidebar-collapsed.history-sidebar-collapsed .main {
-        max-width: none;
+        overflow: hidden;
     }
 
     /* Header - Fixed to the top */
     .header {
         flex-shrink: 0;
-        padding: 10px 0;
+        padding: 10px;
         border-bottom: 1px solid var(--border-color);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-left: 10px;
-        padding-right: 10px;
     }
 
     .header .title {
@@ -1362,25 +1307,57 @@ body.dark-mode .message-timestamp {
         font-weight: 600;
     }
 
-    .header .actions {
-        display: flex;
-        align-items: center;
-        gap: 15px;
+    /* Input Area - Fixed to the bottom */
+    #input-area {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-width: none;
+        padding: 12px 18px;
+        border-radius: 0;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        transform: none;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        flex-shrink: 0;
+        box-sizing: border-box;
     }
 
-    /* Chat Interface - The scrollable area */
-    #chatInterface {
-        flex: 1; /* Takes all available space between header and input */
+    /* Main content area - The flexible container for chat and welcome screen */
+    .main {
+        flex: 1;
         display: flex;
         flex-direction: column;
-        overflow-y: auto; /* This is the key scrollable element */
-        -webkit-overflow-scrolling: touch; /* Smoother scrolling on iOS */
-        padding: 10px 0;
+        padding: 0; /* Remove padding */
+        margin: 0; /* Remove margin */
+        overflow: hidden;
+    }
+
+    /* Chat and Welcome Screen container - fills the space */
+    #chatInterface {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px;
         visibility: visible;
         pointer-events: auto;
     }
-    
-    /* Chat box and messages inside the scrollable area */
+
+    #welcomeScreen {
+        position: static;
+        flex: 1;
+        width: 100%;
+        max-width: none;
+        height: auto;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    /* Chat box and messages */
     .chat-box {
         flex: 1;
         background: transparent;
@@ -1390,12 +1367,12 @@ body.dark-mode .message-timestamp {
         max-width: none;
         margin: 0;
     }
-
+    
     .chat-message-container {
         margin-bottom: 15px;
         align-items: flex-start;
         display: flex;
-        flex-wrap: nowrap; /* Prevents avatar and text from wrapping */
+        flex-wrap: nowrap;
         width: 100%;
         padding: 0 10px;
     }
@@ -1420,6 +1397,7 @@ body.dark-mode .message-timestamp {
         border-bottom-left-radius: 4px;
     }
 
+    /* Avatar styling */
     .chat-avatar {
         width: 36px;
         height: 36px;
@@ -1450,25 +1428,8 @@ body.dark-mode .message-timestamp {
         width: 100%;
         padding-right: 10px;
     }
-
-    /* Input Area - Fixed to the bottom */
-    #input-area {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        max-width: none;
-        padding: 12px 18px;
-        border-radius: 0;
-        border-top-left-radius: 16px;
-        border-top-right-radius: 16px;
-        transform: none;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        z-index: 100;
-        flex-shrink: 0;
-        box-sizing: border-box;
-    }
-
+    
+    /* Other mobile-specific overrides */
     #input-area.fullscreen {
         position: fixed;
         top: 0;
@@ -1482,30 +1443,8 @@ body.dark-mode .message-timestamp {
         z-index: 1000;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     }
-
-    /* Welcome screen - fills the space between header and input */
-    #welcomeScreen {
-        position: static;
-        flex: 1;
-        width: 100%;
-        max-width: none;
-        height: auto;
-        overflow-y: auto;
-    }
-
-    body.main-sidebar-collapsed.history-sidebar-collapsed .main {
-        max-width: none;
-    }
-
+    
     body:not(.welcome-screen-active) #welcomeScreen {
         display: none !important;
-    }
-
-    .hamburger-left, .hamburger-right {
-        display: inline-block;
-        cursor: pointer;
-        font-size: 22px;
-        padding: 6px;
-        color: var(--text-color);
     }
 }
