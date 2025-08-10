@@ -535,10 +535,10 @@ body.dark-mode .chat-box {
         width: 100%;
         padding: 0 5px; 
     } */
-     .bot.chat-message-container {
-    flex-direction: row-reverse; /* Avatar on right from screen perspective */
-    justify-content: flex-start; /* Keep message aligned correctly */
-}
+     /* .bot.chat-message-container {
+    flex-direction: row-reverse; 
+    justify-content: flex-start; 
+} */
 
 
 .chat-avatar {
@@ -1329,7 +1329,10 @@ body.dark-mode .message-timestamp {
         box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
         flex-direction: column;
     }
-    
+    .bot.chat-message-container {
+    flex-direction: row-reverse; /* Avatar on screen right */
+    justify-content: flex-start; /* Keep bubble in correct place */
+}
     #mainSidebar.sidebar-active {
         display: flex;
         left: 0;
@@ -1436,7 +1439,7 @@ body.dark-mode .message-timestamp {
          /* margin-right: 10px;
          margin-left: 0; 
          order: 1;  */
-         margin-left: 10px;
+         margin-left: 10px; /* Space between bubble and avatar */
          margin-right: 0;
     }
 
