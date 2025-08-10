@@ -1279,14 +1279,18 @@ body.dark-mode .message-timestamp {
     will-change: transform; /* Prevent rendering issues */
 }
 
-/* ===== Mobile Responsive Fixes (Final) ===== */
+/* ===== Improved Mobile Responsive Fixes ===== */
 @media screen and (max-width: 768px) {
-    /* Main layout adjustments for mobile */
+    /* Better viewport handling */
     body {
-        padding-bottom: env(safe-area-inset-bottom);
-        height: 100vh; /* Use 100vh for consistent height on mobile */
+        padding: 0;
+        margin: 0;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
+        position: fixed;
+        width: 100%;
+        height: 100%;
     }
 
     .main {
@@ -1294,103 +1298,60 @@ body.dark-mode .message-timestamp {
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        padding: 0 10px;
+        padding: 0;
         margin: 0;
-    }
-
-    /* Input area fixes for keyboard and bottom icons */
-    #input-area {
-        position: fixed;
-        bottom: 0;
-        left: 0;
         width: 100%;
-        max-width: none;
-        padding: 12px 18px;
-        border-radius: 0;
-        border-top-left-radius: 16px;
-        border-top-right-radius: 16px;
-        transform: none;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        z-index: 100;
-        box-sizing: border-box; /* Ensure padding is included in the width */
     }
 
-    /* Adjust chat messages and containers for proper mobile display */
+    /* Improved chat container */
     #chatInterface {
         flex: 1;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        padding-bottom: 70px; /* Add padding to prevent chat from being hidden by input area */
-        visibility: visible; /* Ensure it's always visible on mobile */
-        pointer-events: auto;
-    }
-
-    .chat-box {
-        padding: 10px;
         overflow-y: auto;
-        height: 100%;
-        max-width: none;
-        margin: 0;
-        box-shadow: none; /* Remove box shadow on mobile for a cleaner look */
+        padding: 10px;
+        width: 100%;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
 
-    /* Chat bubble adjustments */
-    .chat-message-container {
-        margin-bottom: 15px;
-        align-items: flex-start;
-        display: flex;
+    /* Better input area handling */
+    #input-area {
+        position: relative; /* Changed from fixed */
+        width: 100%;
+        padding: 12px 15px;
+        box-sizing: border-box;
+        background: white;
+        border-top: 1px solid #eee;
+    }
+
+    /* Chat message improvements */
+    .chat-box {
+        padding: 0;
+        overflow-y: auto;
+        flex: 1;
     }
 
     .message {
-        padding: 10px 15px;
-        border-radius: 18px;
-        line-height: 1.5;
-        font-size: 0.95em;
-        max-width: 80%;
+        max-width: 85%;
+        padding: 12px 16px;
+        margin: 8px 10px;
+        font-size: 16px;
     }
 
-    .user .message {
-        margin-left: auto;
-        margin-right: 10px;
-        border-bottom-right-radius: 4px;
-    }
-
-    .bot .message {
-        margin-right: auto;
-        margin-left: 10px;
-        border-bottom-left-radius: 4px;
-    }
-
+    /* Better avatar positioning */
     .chat-avatar {
-        width: 32px;
-        height: 32px;
-        font-size: 0.8em;
+        width: 36px;
+        height: 36px;
+        align-self: flex-start;
+        margin-top: 8px;
     }
 
-    .user .chat-avatar {
-        order: 2;
-        margin-left: 10px;
-        margin-right: 0;
-    }
-
-    .bot .chat-avatar {
-        order: 1;
-        margin-right: 10px;
-        margin-left: 0;
-    }
-
-    /* Hide welcome screen when chat is active */
-    body:not(.welcome-screen-active) #welcomeScreen {
-        display: none !important;
-    }
-
-    /* Mobile sidebar toggle buttons */
-    .hamburger-left, .hamburger-right {
-        display: inline-block;
-        cursor: pointer;
-        font-size: 22px;
-        padding: 6px;
-        color: var(--text-color);
+    /* Keyboard-aware layout */
+    @media (max-height: 500px) {
+        #chatInterface {
+            padding-bottom: 5px;
+        }
+        .message {
+            padding: 8px 12px;
+            margin: 5px 8px;
+        }
     }
 }
