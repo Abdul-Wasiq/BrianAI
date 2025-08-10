@@ -1157,10 +1157,12 @@ body:not(.welcome-screen-active) #input-area {
 }
 
 .message-timestamp {
-  font-size: 0.75em;
-  color: var(--timestamp-color, #888);
-  margin-top: 4px;
-  margin-left: 500px; /* align under Brian’s message bubble */
+  position: absolute;
+  bottom: 4px;
+  right: 12px;
+  font-size: 0.7em;
+  color: var(--timestamp-color, #666);
+  opacity: 0.8;
 }
 body.dark-mode .message-timestamp {
   color: #aaa;
@@ -1386,15 +1388,19 @@ body.dark-mode .message-timestamp {
     }
     
     .chat-message-container {
-        margin-bottom: 15px;
-        display: flex;
-        flex-wrap: nowrap;
-        width: 100%;
-        padding: 0 10px;
+        max-width: 100%;
     }
 
     .message {
-        max-width: calc(85% - 46px); /* 46px = avatar width (36px) + margin (10px) */
+        padding: 12px 18px;
+        border-radius: 18px;
+        line-height: 1.6;
+        font-size: 1em;
+        max-width: calc(85% - 46px); /* Account for avatar */
+        min-width: 40%; /* Prevent bubbles from becoming too narrow */
+        position: relative; /* For timestamp positioning */
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     /* Specific styling for user and bot messages */
@@ -1416,10 +1422,10 @@ body.dark-mode .message-timestamp {
     }
     
     .bot .message {
+        background: var(--bot-message-bg, #f0f0f0);
         margin-right: auto;
         margin-left: 0;
         border-bottom-left-radius: 4px;
-        order: 2; /* This will make the bubble appear after the avatar */
     }
 
     .bot .chat-avatar {
