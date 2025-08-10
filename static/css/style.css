@@ -1,3 +1,5 @@
+
+
      /* === [LIGHT AND DARK MODE] === */
 :root {
     /* General Colors */
@@ -196,6 +198,23 @@ body.dark-mode .sidebar-base:not(.expanded):hover {
     justify-content: space-between;
     align-items: center;
     white-space: nowrap;
+}
+.title {
+    margin-right: 350px;
+}
+.login_button {
+    background-color: #1E90FF; /* Dodger Blue */
+    color: white;              /* Make text readable */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.login_button:hover {
+    background-color: #1C86EE; /* Slightly darker on hover */
 }
 
 .sidebar-base h3 .sidebar-title-text {
@@ -1260,108 +1279,115 @@ body.dark-mode .message-timestamp {
     will-change: transform; /* Prevent rendering issues */
 }
 
-/* ===== Mobile Responsive Fix ===== */
+/* ===== Mobile Responsive Fixes (Improved) ===== */
 @media screen and (max-width: 768px) {
-    /* Hide sidebars by default and make them full-height overlays for mobile */
-    #mainSidebar,
-    #historySidebar {
-        display: none;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        width: 250px;
-        background-color: var(--sidebar-bg, #fff);
-        z-index: 9999;
-        overflow-y: auto;
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+    /* Main layout adjustments for mobile */
+    body {
+        padding-bottom: env(safe-area-inset-bottom); /* Fix for iPhone's bottom bar */
+        display: flex;
+        flex-direction: column;
+        height: 100dvh; /* Use dynamic viewport height for better keyboard handling */
     }
 
-    /* Slide-in animations for sidebars */
-    #mainSidebar.sidebar-active {
-        display: block;
-        animation: slideInLeft 0.3s ease forwards;
-        left: 0;
-    }
-    #historySidebar.sidebar-active {
-        display: block;
-        animation: slideInRight 0.3s ease forwards;
-        right: 0;
-    }
-
-    @keyframes slideInLeft {
-        from { transform: translateX(-100%); }
-        to { transform: translateX(0); }
-    }
-    @keyframes slideInRight {
-        from { transform: translateX(100%); }
-        to { transform: translateX(0); }
-    }
-
-    /* Overlay to dim the background when a sidebar is open */
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.4);
-        z-index: 9998;
-    }
-    .sidebar-overlay.active {
-        display: block;
-    }
-
-    /* Full width chat area and mobile padding */
     .main {
-        padding: 0 10px; /* Use smaller padding for mobile */
-        margin: 0; /* Clear any desktop centering */
-    }
-    body.main-sidebar-collapsed.history-sidebar-collapsed .main {
-        max-width: none;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 0 10px;
+        margin: 0;
     }
     
-    /* Ensure the chat box and welcome screen are full-width and fill the space */
-    .chat-box, #welcomeScreen, #input-area {
+    /* Input area fixes for keyboard and bottom icons */
+    #input-area {
+        position: fixed; /* Use fixed position to keep it at the bottom */
+        bottom: 0;
+        left: 0;
         width: 100%;
         max-width: none;
-        margin: 0;
-        box-sizing: border-box; /* Ensure padding is included in the width */
+        padding: 12px 18px;
+        border-radius: 0; /* Remove border-radius at the bottom edge */
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        transform: none;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+    }
+    
+    #input-area.fullscreen {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        max-width: none;
+        border-radius: 0;
+        padding: 20px;
+        transform: none;
+        z-index: 1000;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     }
 
-    /* Adjust chat bubbles for mobile layout */
+    /* Adjust chat messages for better mobile presentation */
+    .chat-box {
+        padding: 10px;
+        overflow-y: auto;
+        height: 100%; /* Fill available vertical space */
+        max-width: none;
+        margin: 0;
+    }
+    
     .chat-message-container {
-        flex-wrap: wrap; /* Allow avatar and message to wrap to a new line if needed */
-        margin-bottom: 15px; /* Adjust spacing between messages */
+        margin-bottom: 12px;
+        align-items: flex-start;
     }
-    .user .message, .bot .message {
-        max-width: 85%; /* Let bubbles take up most of the width */
-        margin: 0 10px 0 10px; /* Adjust margins to give space from the edges */
+
+    .message {
+        flex-grow: 1;
+        padding: 10px 15px; /* Reduce padding for smaller screens */
+        border-radius: 18px;
+        line-height: 1.5;
+        font-size: 0.95em;
+        max-width: 80%; /* Adjust max width for better wrapping */
     }
-    .user .chat-avatar {
-        margin-left: 0; /* Remove right margin to align left */
-        order: 1; /* Keep avatar on the left */
-    }
-    .bot .chat-avatar {
-        margin-right: 0; /* Remove left margin to align left */
-        order: 1;
-    }
+
     .user .message {
-        order: 2; /* Put the user message after the avatar */
+        margin-left: auto; /* Align user messages to the right */
+        margin-right: 10px;
+        border-bottom-right-radius: 4px;
     }
     .bot .message {
-        order: 2;
+        margin-right: auto; /* Align bot messages to the left */
+        margin-left: 10px;
+        border-bottom-left-radius: 4px;
     }
 
-    /* Mobile buttons in header */
-    .header {
-        padding: 10px 0;
+    .chat-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8em;
     }
-    .hamburger-left, .hamburger-right {
-        display: inline-block;
-        cursor: pointer;
-        font-size: 22px;
-        padding: 6px;
-        color: var(--text-color);
+    
+    .user .chat-avatar {
+        order: 2; /* Put the user avatar on the right */
+        margin-left: 10px;
+        margin-right: 0;
+    }
+    
+    .bot .chat-avatar {
+        order: 1; /* Keep the bot avatar on the left */
+        margin-right: 10px;
+        margin-left: 0;
+    }
+    
+    /* Other mobile-specific overrides */
+    .header .actions a {
+        padding: 6px 12px;
+        font-size: 0.9em;
+    }
+    
+    .tool-output-container {
+        max-height: 200px; /* Reduce max height for tool output on mobile */
     }
 }
