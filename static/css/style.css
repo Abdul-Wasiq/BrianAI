@@ -1279,15 +1279,15 @@ body.dark-mode .message-timestamp {
     will-change: transform; /* Prevent rendering issues */
 }
 
-/* ===== Mobile Responsive Fixes (Final & Corrected) ===== */
+/* ===== Mobile Responsive Fixes (Corrected and Final) ===== */
 @media screen and (max-width: 768px) {
     /* Main body layout for mobile */
     body {
         height: 100vh;
-        height: 100dvh;
+        height: 100dvh; /* Use dynamic viewport height for better keyboard handling */
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow: hidden; /* Prevents unwanted scrolling on the body */
     }
 
     /* Sidebars as full-screen overlays */
@@ -1303,12 +1303,12 @@ body.dark-mode .message-timestamp {
         overflow-y: auto;
         box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
     }
-
+    
     #mainSidebar.sidebar-active {
         display: flex;
         left: 0;
     }
-
+    
     #historySidebar.sidebar-active {
         display: flex;
         right: 0;
@@ -1321,10 +1321,10 @@ body.dark-mode .message-timestamp {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(0,0,0,0.4);
         z-index: 9998;
     }
-
+    
     .sidebar-overlay.active {
         display: block;
     }
@@ -1336,7 +1336,11 @@ body.dark-mode .message-timestamp {
         flex-direction: column;
         padding: 0 10px;
         margin: 0;
-        overflow: hidden;
+        overflow: hidden; /* Control scrolling within the chat box, not the main area */
+    }
+    
+    body.main-sidebar-collapsed.history-sidebar-collapsed .main {
+        max-width: none;
     }
 
     /* Header - Fixed to the top */
@@ -1366,20 +1370,16 @@ body.dark-mode .message-timestamp {
 
     /* Chat Interface - The scrollable area */
     #chatInterface {
-        flex: 1;
+        flex: 1; /* Takes all available space between header and input */
         display: flex;
         flex-direction: column;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        /* Adjusted padding-bottom to bring bubbles closer to the input box */
-        padding-bottom: 70px; /* Reduced from 90px to 70px */
-        padding-top: 10px;
-        padding-left: 0;
-        padding-right: 0;
+        overflow-y: auto; /* This is the key scrollable element */
+        -webkit-overflow-scrolling: touch; /* Smoother scrolling on iOS */
+        padding: 10px 0;
         visibility: visible;
         pointer-events: auto;
     }
-
+    
     /* Chat box and messages inside the scrollable area */
     .chat-box {
         flex: 1;
@@ -1391,16 +1391,13 @@ body.dark-mode .message-timestamp {
         margin: 0;
     }
 
-    /* Chat message container adjustments */
     .chat-message-container {
         margin-bottom: 15px;
         align-items: flex-start;
         display: flex;
-        flex-wrap: nowrap;
+        flex-wrap: nowrap; /* Prevents avatar and text from wrapping */
         width: 100%;
         padding: 0 10px;
-        /* Add a small negative margin to pull up the timestamp and other elements */
-        margin-bottom: -5px; 
     }
 
     .message {
@@ -1423,7 +1420,6 @@ body.dark-mode .message-timestamp {
         border-bottom-left-radius: 4px;
     }
 
-    /* Avatar styling */
     .chat-avatar {
         width: 36px;
         height: 36px;
