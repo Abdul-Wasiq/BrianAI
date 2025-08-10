@@ -529,10 +529,12 @@ body.dark-mode .chat-box {
 }
 
 .chat-message-container {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 20px;
-}
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: nowrap;
+        width: 100%;
+        padding: 0 5px; /* Reduced side padding */
+    }
 
 .chat-avatar {
     width: 36px;
@@ -1419,6 +1421,8 @@ body.dark-mode .message-timestamp {
         margin-right: auto;
         margin-left: 0;
         border-bottom-left-radius: 4px;
+        width: auto;
+        position: relative;
         order: 2; /* This will make the bubble appear after the avatar */
     }
 
