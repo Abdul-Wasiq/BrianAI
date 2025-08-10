@@ -1371,7 +1371,8 @@ body.dark-mode .message-timestamp {
         flex-direction: column;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: 90px;
+        /* Adjusted padding-bottom to bring bubbles closer to the input box */
+        padding-bottom: 70px; /* Reduced from 90px to 70px */
         padding-top: 10px;
         padding-left: 0;
         padding-right: 0;
@@ -1390,6 +1391,7 @@ body.dark-mode .message-timestamp {
         margin: 0;
     }
 
+    /* Chat message container adjustments */
     .chat-message-container {
         margin-bottom: 15px;
         align-items: flex-start;
@@ -1397,6 +1399,8 @@ body.dark-mode .message-timestamp {
         flex-wrap: nowrap;
         width: 100%;
         padding: 0 10px;
+        /* Add a small negative margin to pull up the timestamp and other elements */
+        margin-bottom: -5px; 
     }
 
     .message {
@@ -1419,6 +1423,7 @@ body.dark-mode .message-timestamp {
         border-bottom-left-radius: 4px;
     }
 
+    /* Avatar styling */
     .chat-avatar {
         width: 36px;
         height: 36px;
