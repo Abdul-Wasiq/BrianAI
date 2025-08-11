@@ -441,11 +441,6 @@ body.dark-mode .welcome-logo {
 .welcome-logo svg {
     display: block; /* Remove extra space below SVG */
 }
-.spin-element {
-    animation: spin 1.5s linear infinite; /* Reduced from 4s to 1.5s for faster spin */
-    transform-origin: 50% 50%;
-    filter: brightness(1.2) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5)); /* Added for shininess */
-}
 
 @keyframes spin {
   from { transform: rotate(0deg); }
@@ -453,24 +448,27 @@ body.dark-mode .welcome-logo {
 }
 
 @keyframes glow {
-  0%, 100% { filter: drop-shadow(0 0 3px rgba(255,255,255,0.6)); }
-  50% { filter: drop-shadow(0 0 8px rgba(255,255,255,1)); }
+  0%, 100% {
+    filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.35));
+  }
 }
 
 .spin-element {
   animation: spin 1.5s linear infinite;
   transform-origin: 50% 50%;
-  filter: brightness(1.2) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+  filter: brightness(1.1) drop-shadow(0 0 3px rgba(255, 255, 255, 0.4));
 }
 
 .eye-glow {
-  animation: glow 2.5s ease-in-out infinite;
+  animation: glow 3s ease-in-out infinite;
   transform-origin: 50% 50%;
   fill: var(--logo-color);
   cursor: default;
-  filter: drop-shadow(0 0 3px rgba(255,255,255,0.6));
+  filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.25));
 }
-
 
 
 .welcome-heading {
