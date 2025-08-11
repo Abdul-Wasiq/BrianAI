@@ -448,13 +448,29 @@ body.dark-mode .welcome-logo {
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
+
+@keyframes glow {
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(255,255,255,0.6)); }
+  50% { filter: drop-shadow(0 0 8px rgba(255,255,255,1)); }
+}
+
+.spin-element {
+  animation: spin 1.5s linear infinite;
+  transform-origin: 50% 50%;
+  filter: brightness(1.2) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+}
+
+.eye-glow {
+  animation: glow 2.5s ease-in-out infinite;
+  transform-origin: 50% 50%;
+  fill: var(--logo-color);
+  cursor: default;
+  filter: drop-shadow(0 0 3px rgba(255,255,255,0.6));
+}
+
 
 
 .welcome-heading {

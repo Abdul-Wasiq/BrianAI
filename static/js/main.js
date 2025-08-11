@@ -642,7 +642,7 @@ function adjustTextareaHeight() {
     // --- Typing Animation on greeting Logic ===
     const phrases = [
     "So… what’s the move?",
-    "You want something Name it.",
+    "You want something. Name it.",
     "Every answer starts with a question."
 ];
 
