@@ -451,7 +451,7 @@ function toggleTheme() {
 
 // Make sure isMobile is properly defined (add this if not already in your code)
 function isMobile() {
-  return window.innerWidth <= 768;
+    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
 
@@ -1146,12 +1146,30 @@ async function createToolOutputBox(parentChatContainer, lang, content, preceding
         return text.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 // SEND MESSAGE by clicking on Enter ===
-    userInputTextarea.addEventListener("keypress", function (e) {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
+    // With this updated version:
+userInputTextarea.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        // On mobile, we want Enter to create new lines by default
+        if (isMobile()) {
+            // Only send message if it's a plain Enter (no Shift)
+            if (!e.shiftKey) {
+                // Check if the textarea has content before sending
+                if (userInputTextarea.value.trim()) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            }
+        } 
+        // On desktop, maintain current behavior
+        else {
+            if (!e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
         }
-    });
+    }
+});
+
 
     // --- Input Area Fullscreen Toggle ---
     function toggleInputFullscreen() {
