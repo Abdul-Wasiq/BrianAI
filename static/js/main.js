@@ -128,28 +128,44 @@ function hideAllSidebarPanels() {
 // Update the updateUserProfileUI function to load profile and settings data
 // and ensure the correct sections are populated.
 function updateUserProfileUI(user) {
-  const greetingEl = document.querySelector(".welcome-heading");
-  if (greetingEl && user && user.name) {
-    greetingEl.textContent = `Hi, ${user.name}`;
-  } else if (greetingEl) {
-    greetingEl.textContent = "Hi there!";
-  }
-
-  // Update profile section
-  if (user) {
-    document.getElementById("profileName").textContent = user.name || 'N/A';
-    document.getElementById("profileEmail").textContent = user.email || 'N/A';
-    
-    // Update verification status
-    const verificationEl = document.getElementById("profileVerificationStatus");
-    if (verificationEl) {
-      const verified = user.verified || auth.currentUser?.emailVerified;
-      verificationEl.querySelector('.verified-icon').style.display = verified ? 'inline-block' : 'none';
-      verificationEl.querySelector('.unverified-icon').style.display = verified ? 'none' : 'inline-block';
-      verificationEl.querySelector('.verification-text').textContent = verified ? 'Verified' : 'Not Verified';
+    if (user) {
+        // User is logged in, update UI with their info
+        document.getElementById("profileName").innerText = user.displayName || user.email; // Use name or email
+        document.getElementById("profileEmail").innerText = user.email;
+        document.querySelector(".profile-picture").src = user.photoURL || 'https://via.placeholder.com/60'; // Use user's photo or a default
+        document.getElementById("greeting").innerText = `Hi ${user.displayName || "there"}!`;
+        document.getElementById("profileVerificationStatus").style.display = "block";
+    } else {
+        // User is logged out, reset UI to default state
+        document.getElementById("profileName").innerText = "Guest";
+        document.getElementById("profileEmail").innerText = "Not Logged In";
+        document.querySelector(".profile-picture").src = 'https://via.placeholder.com/60';
+        document.getElementById("greeting").innerText = "Hi there!";
+        document.getElementById("profileVerificationStatus").style.display = "none";
     }
-  }
 }
+
+// Your auth state listener should call this new function
+auth.onAuthStateChanged((user) => {
+    updateUserProfileUI(user); // Call the new function here
+
+    if (user) {
+        console.log("User logged in:", user.email);
+        // Display the correct verification status
+        if (!user.emailVerified) {
+            document.getElementById("resendVerificationContainer").style.display = "block";
+            document.getElementById("verificationStatus").style.display = "none";
+        } else {
+            document.getElementById("verificationStatus").style.display = "block";
+            document.getElementById("resendVerificationContainer").style.display = "none";
+        }
+    } else {
+        console.log("No user logged in");
+        document.getElementById("verificationStatus").style.display = "none";
+        document.getElementById("resendVerificationContainer").style.display = "none";
+    }
+});
+/*Changes here end I changed auth.onAuth and updateUserProfileUI(user)*/
     // login box
     let isSignup = false;
 
@@ -384,11 +400,6 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-
-function updateUserProfileUI(user) {
-  // Example: update Profile tab with user.name and user.email ===
-  console.log("Logged in user:", user);
-}
 
 document.addEventListener("DOMContentLoaded", function() {
   // Apply theme
@@ -1237,14 +1248,6 @@ userInputTextarea.addEventListener("keydown", function (e) {
         userInputTextarea.focus(); // Keep focus on the textarea
     }
 
-  function updateUserProfileUI(user) {
-    const greetingEl = document.querySelector(".welcome-heading");
-    if (greetingEl && user && user.name) {
-      greetingEl.textContent = `Hi, ${user.name}`;
-    } else if (greetingEl) {
-      greetingEl.textContent = "Hi there!";
-    }
-  }
 
   function hideAllSidebarPanels() {
   const panels = document.querySelectorAll(".sidebar-panel");
