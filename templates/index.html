@@ -73,16 +73,20 @@
                 <label>Password</label>
                 <input type="password" id="authPassword" placeholder="••••••••">
             </div>
-
+<!-- Change here -->
             <button onclick="submitAuth()">Continue</button>
 
-            <p class="toggle-auth">
-                <a href="#" onclick="toggleAuthMode()">Don't have an account? Create one</a>
-            </p>
-            <p class="forgot-pass" id="forgotText">
-                <a href="#">Forgot password?</a>
-            </p>
+<button class="google-sign-in-btn" onclick="signInWithGoogle()">
+    <i class="fab fa-google"></i> Sign in with Google
+</button>
 
+<p class="toggle-auth">
+    <a href="#" onclick="toggleAuthMode()">Don't have an account? Create one</a>
+</p>
+<p class="forgot-pass" id="forgotText">
+    <a href="#">Forgot password?</a>
+</p>
+<!-- Change here end -->
             <!-- Add this inside your auth-box div -->
            <div id="resendVerificationContainer" style="display: none; margin-top: 15px;">
             <p style="font-size: 0.9em; margin-bottom: 8px;">Didn't get the email?</p>

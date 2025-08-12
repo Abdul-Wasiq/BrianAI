@@ -10,6 +10,9 @@ window.toggleAuthMode = toggleAuthMode;
 window.submitAuth = submitAuth;
 window.resendVerification = resendVerification;
 
+
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
 let currentSessionId = localStorage.getItem("currentSessionId");
 
 // --- New Sidebar Section Toggling Logic ---
@@ -191,9 +194,52 @@ function hideNotification() {
   box.style.display = "none";
 }
 
+/* new changes start */
+// Change this function to send the verification email
+function sendVerificationEmail(user) {
+    user.sendEmailVerification().then(() => {
+        showNotification("Verification email sent! Please check your inbox.", "yellow");
+    }).catch((error) => {
+        console.error("Error sending verification email:", error);
+        showNotification("Failed to send verification email. Please try again.", "red");
+    });
+}
 
+// Update the resendVerification function to call the new one
+function resendVerification() {
+    const user = auth.currentUser;
+    if (user) {
+        sendVerificationEmail(user);
+    } else {
+        showNotification("No user logged in to resend verification to.", "red");
+    }
+}
+/* new changes end */
 
-// Modify your submitAuth function in main.js
+// new changes here
+// Function to handle Google Sign-in
+function signInWithGoogle() {
+    firebase.auth().signInWithPopup(googleProvider)
+    .then((result) => {
+        // The signed-in user info.
+        const user = result.user;
+        console.log("Google user signed in:", user);
+        
+        // You can now close the modal and show a success message
+        closeAuthModal();
+        showNotification(`Welcome, ${user.displayName}! You're logged in. 😊`, "green");
+
+        // The user's email is automatically verified with Google sign-in
+        // You don't need to manually check or send a verification email.
+    })
+    .catch((error) => {
+        // Handle Errors here.
+        console.error("Google sign-in error:", error);
+        showNotification("Failed to sign in with Google. Please try again.", "red");
+    });
+}
+// new changes end
+/* new changes here */
 async function submitAuth() {
   const name = document.getElementById("authName").value;
   const email = document.getElementById("authEmail").value;
@@ -209,9 +255,10 @@ async function submitAuth() {
       // Sign up logic
       const userCredential = await auth.createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
-      
-      // Send verification email
+
+      // Send verification email and show a yellow notification
       await user.sendEmailVerification();
+      showNotification(`Verification email sent to ${email}. Please check your inbox.`, "yellow");
       
       // Update profile with name
       await user.updateProfile({ displayName: name });
@@ -228,22 +275,27 @@ async function submitAuth() {
           voice: "Male"
         }
       }));
-      
-      // showNotification(`Verification email sent to ${email}. Please check your inbox.`);
-      // document.getElementById("resendVerificationContainer").style.display = "block";
+
+      document.getElementById("resendVerificationContainer").style.display = "block";
+      document.getElementById("verificationStatus").style.display = "none";
       toggleAuthMode(); // Switch back to login after signup
+
     } else {
       // Login logic
       const userCredential = await auth.signInWithEmailAndPassword(email, password);
       const user = userCredential.user;
+
+      // === CRITICAL FIX: Check if the email is verified ===
+      if (!user.emailVerified) {
+        // Log the user out immediately so they cannot access the chat
+        await auth.signOut();
+        showNotification("Please verify your email first. Check your inbox and click the verification link.", "red");
+        // We can also show the resend button here
+        document.getElementById("resendVerificationContainer").style.display = "block";
+        return;
+      }
       
-      // if (!user.emailVerified) {
-      //   showNotification("Please verify your email first. Check your inbox.");
-      //   document.getElementById("resendVerificationContainer").style.display = "block";
-      //   return;
-      // }
-      
-      // Save verified user to localStorage
+      // If the email is verified, proceed with a normal login
       localStorage.setItem("user", JSON.stringify({
         name: user.displayName || "Anonymous",
         email: email,
@@ -258,6 +310,7 @@ async function submitAuth() {
       
       updateUserProfileUI({ name: user.displayName, email });
       closeAuthModal();
+      showNotification("Login successful! Welcome back. 😊", "green"); // You can use a green notification for a successful login.
     }
   } catch (error) {
     console.error("Auth error:", error);
@@ -265,25 +318,20 @@ async function submitAuth() {
   }
 }
 
-async function resendVerification() {
-  const user = auth.currentUser;
-  if (!user) return;
-  
-  try {
-    await user.sendEmailVerification();
-    // showNotification("Verification email resent. Please check your inbox.");
-  } catch (error) {
-    showNotification("Error: " + error.message);
-  }
-}
+/* new changes here */
 
 function checkEmailVerification(user) {
-  // if (user.emailVerified) {
-  //   document.getElementById("verificationStatus").style.display = "block";
-  //   document.getElementById("resendVerificationContainer").style.display = "none";
-  // } else {
-  //   document.getElementById("resendVerificationContainer").style.display = "block";
-  // }
+  if (user && user.emailVerified) {
+    document.getElementById("verificationStatus").style.display = "block";
+    document.getElementById("resendVerificationContainer").style.display = "none";
+  } else if (user && !user.emailVerified) {
+    document.getElementById("resendVerificationContainer").style.display = "block";
+    document.getElementById("verificationStatus").style.display = "none";
+  } else {
+    // For a logged-out state, hide both
+    document.getElementById("resendVerificationContainer").style.display = "none";
+    document.getElementById("verificationStatus").style.display = "none";
+  }
 }
 
 function formatFirebaseError(error) {
