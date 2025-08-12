@@ -477,18 +477,18 @@ async function submitAuth() {
         if (isSignup) {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     const user = userCredential.user;
-    await fetch("/send-verification-email", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: email })
-});
+//     await fetch("/send-verification-email", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({ email: email })
+// });
     
     // Call the Flask backend to send the email
-    fetch('/send-verification-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email })
-    });
+    // fetch('/send-verification-email', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ email: email })
+    // });
     showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning");
     await user.updateProfile({
         displayName: name
@@ -510,12 +510,12 @@ async function submitAuth() {
         } else {
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
             const user = userCredential.user;
-            if (!user.emailVerified) {
-                await auth.signOut();
-                showNotification("Please verify your email first. Check your inbox and click the verification link.", "error");
-                document.getElementById("resendVerificationContainer").style.display = "block";
-                return;
-            }
+            // if (!user.emailVerified) {
+            //     await auth.signOut();
+            //     showNotification("Please verify your email first. Check your inbox and click the verification link.", "error");
+            //     document.getElementById("resendVerificationContainer").style.display = "block";
+            //     return;
+            // }
             localStorage.setItem("user", JSON.stringify({
                 name: user.displayName || "Anonymous",
                 email: email,
