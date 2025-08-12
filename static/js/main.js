@@ -463,69 +463,71 @@ function signInWithGoogle() {
         showNotification("Failed to sign in with Google. Please try again.", "error"); // Red for error
     });
 }
-// new changes end
-/* new changes here */
 async function submitAuth() {
-  const name = document.getElementById("authName").value;
-  const email = document.getElementById("authEmail").value;
-  const password = document.getElementById("authPassword").value;
+    const name = document.getElementById("authName").value;
+    const email = document.getElementById("authEmail").value;
+    const password = document.getElementById("authPassword").value;
 
-  if (!email || !password || (isSignup && !name)) {
-    showNotification("Please fill all required fields.", "error"); // Red for error
-    return;
-  }
-
-  try {
-    if (isSignup) {
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-      const user = userCredential.user;
-      await user.sendEmailVerification();
-      showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning"); // Yellow for warning
-      await user.updateProfile({ displayName: name });
-      localStorage.setItem("user", JSON.stringify({
-        name: name,
-        email: email,
-        uid: user.uid,
-        verified: false,
-        settings: {
-          theme: "light",
-          language: "English",
-          voice: "Male"
-        }
-      }));
-      document.getElementById("resendVerificationContainer").style.display = "block";
-      document.getElementById("verificationStatus").style.display = "none";
-      toggleAuthMode();
-    } else {
-      const userCredential = await auth.signInWithEmailAndPassword(email, password);
-      const user = userCredential.user;
-      if (!user.emailVerified) {
-        await auth.signOut();
-        showNotification("Please verify your email first. Check your inbox and click the verification link.", "error"); // Red for error
-        document.getElementById("resendVerificationContainer").style.display = "block";
+    if (!email || !password || (isSignup && !name)) {
+        showNotification("Please fill all required fields.", "error");
         return;
-      }
-      localStorage.setItem("user", JSON.stringify({
-        name: user.displayName || "Anonymous",
-        email: email,
-        uid: user.uid,
-        verified: true,
-        settings: {
-          theme: "light",
-          language: "English",
-          voice: "Male"
-        }
-      }));
-      updateUserProfileUI({ name: user.displayName, email });
-      closeAuthModal();
-      showNotification("Login successful! Welcome back. 😊", "success"); // Green for success
     }
-  } catch (error) {
-    console.error("Auth error:", error);
-    showNotification(formatFirebaseError(error), "error"); // Red for error
-  }
+
+    try {
+        if (isSignup) {
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            await user.sendEmailVerification();
+            showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning");
+            await user.updateProfile({
+                displayName: name
+            });
+            localStorage.setItem("user", JSON.stringify({
+                name: name,
+                email: email,
+                uid: user.uid,
+                verified: false,
+                settings: {
+                    theme: "light",
+                    language: "English",
+                    voice: "Male"
+                }
+            }));
+            document.getElementById("resendVerificationContainer").style.display = "block";
+            document.getElementById("verificationStatus").style.display = "none";
+            toggleAuthMode();
+        } else {
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            if (!user.emailVerified) {
+                await auth.signOut();
+                showNotification("Please verify your email first. Check your inbox and click the verification link.", "error");
+                document.getElementById("resendVerificationContainer").style.display = "block";
+                return;
+            }
+            localStorage.setItem("user", JSON.stringify({
+                name: user.displayName || "Anonymous",
+                email: email,
+                uid: user.uid,
+                verified: true,
+                settings: {
+                    theme: "light",
+                    language: "English",
+                    voice: "Male"
+                }
+            }));
+            updateUserProfileUI({
+                name: user.displayName,
+                email
+            });
+            closeAuthModal();
+            showNotification("Login successful! Welcome back. 😊", "success");
+        }
+    } catch (error) {
+        console.error("Auth error:", error);
+        showNotification(formatFirebaseError(error), "error");
+    }
 }
-/* new changes here */
 
 function checkEmailVerification(user) {
   if (user && user.emailVerified) {
