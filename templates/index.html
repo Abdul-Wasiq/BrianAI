@@ -54,6 +54,10 @@
 </script>
 
 <body>
+    <div id="notificationBox" class="notification-box">
+      <span id="notificationMessage"></span>
+      <span class="close-btn" onclick="hideNotification()">&times;</span>
+    </div>
     <!-- === [LOGIN/SIGN UP POP-UP - STARTING] === -->
     <div id="authModal" class="auth-modal">
         <div class="auth-box">
@@ -103,11 +107,6 @@
     </div>
 <!-- === [LOGIN/SIGN UP POP-UP - ENDING] === -->
 
-<!-- === [NOTIFICATION BOX - REUSABLE] === -->
-<div id="notificationBox" class="notification-box" style="display: none;">
-  <span id="notificationMessage"></span>
-  <span class="close-btn" onclick="hideNotification()">&times;</span>
-</div>
 
 
 <!-- === [LEFT SIDE BAR - STARTING] === -->
@@ -242,7 +241,7 @@
       <span class="typing-cursor">|</span>
     </h2>
     <p class="welcome-description">
-      Soon, we'll be able to solve problems with video calls and screen sharing.
+      Soon, Brian will be able to solve problems with video calls and screen sharing.
     </p>
   </div>
 </div>

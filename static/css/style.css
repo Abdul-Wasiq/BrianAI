@@ -3,11 +3,15 @@
      /* === [LIGHT AND DARK MODE] === */
 :root {
     /* General Colors */
+    /* General Colors */
     --bg-color: #f6fff9;
     --text-color: #333;
     --border-color: #e0e0e0;
     --bg-secondary: #adadad; /* Light mode background */
     --hover-color: #e0e0e0;
+    --success-color: #4CAF50; /* Green for success */
+    --warning-color: #ff9800; /* Orange for warnings */
+    --error-color: #f44336; /* Red for errors */
 
     /* Sidebar Colors */
     --sidebar-bg: #ffffff;
@@ -1228,25 +1232,39 @@ body.dark-mode .message-timestamp {
 }
 
 .notification-box {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #f44336; /* Red */
-  color: white;
-  padding: 16px 24px;
-  border-radius: 6px;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--success-color); /* Default color is green */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    transition: transform 0.3s ease-in-out;
+    transform: translateY(-100px); /* This hides the box by default */
+}
+
+/* New CSS classes for different notification types */
+.notification-box.success {
+    background-color: var(--success-color);
+}
+
+.notification-box.warning {
+    background-color: var(--warning-color);
+}
+
+.notification-box.error {
+    background-color: var(--error-color);
 }
 
 .notification-box .close-btn {
-  cursor: pointer;
-  font-weight: bold;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 20px;
 }
+
+
 .hidden-tab-content {
     display: none !important;
 }
@@ -1299,6 +1317,43 @@ body.dark-mode .message-timestamp {
 .sidebar-base {
     transition: transform 0.3s ease, width 0.3s ease; /* Smoother transitions */
     will-change: transform; /* Prevent rendering issues */
+}
+
+/* Guest Prompt Box Styling */
+.guest-prompt-box {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    background-color: var(--warning-color); /* This is a yellow/orange color */
+    color: var(--background-color);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9em;
+}
+
+.guest-prompt-box .close-btn {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.prompt-login-btn {
+    background-color: #2196f3; /* You can change this to a primary button color from your theme */
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
 }
 
 /* ===== Mobile Responsive Fixes (Final and Polished) ===== */

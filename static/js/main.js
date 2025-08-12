@@ -10,6 +10,231 @@ window.toggleAuthMode = toggleAuthMode;
 window.submitAuth = submitAuth;
 window.resendVerification = resendVerification;
 
+// Add these variables with your other global variables at the top
+
+const PROMPT_INTERVAL_SECONDS = 5; // Change this to 300 for 5 minutes after testing.
+let guestPromptInterval = null;
+
+// === NEW GUEST PROMPT VARIABLES AND FUNCTIONS ===
+// Change this to 300 for 5 minutes after testing
+let isGuest = true;
+
+// A new function to handle the guest prompt logic
+function handleGuestPrompt() {
+  // If the user is a guest, start the repeating timer.
+  if (isGuest && !guestPromptInterval) {
+    guestPromptInterval = setInterval(() => {
+      showNotification("For a better experience, please sign up or log in to save your chat! ✨", "yellow");
+      openAuthModal();
+    }, PROMPT_INTERVAL_SECONDS * 1000);
+  }
+}
+
+// Function to stop the repeating timer
+function stopGuestPrompt() {
+  if (guestPromptInterval) {
+    clearInterval(guestPromptInterval);
+    guestPromptInterval = null;
+  }
+}
+
+// === UPDATED auth.onAuthStateChanged LISTENER ===
+// This listener now handles starting/stopping the guest prompt timer.
+auth.onAuthStateChanged((user) => {
+  isGuest = !user; // Update guest status
+  updateUserProfileUI(user);
+
+  if (user) {
+    console.log("User logged in:", user.email);
+    stopGuestPrompt(); // Stop the timer if the user logs in
+    if (!user.emailVerified) {
+      document.getElementById("resendVerificationContainer").style.display = "block";
+      document.getElementById("verificationStatus").style.display = "none";
+    } else {
+      document.getElementById("verificationStatus").style.display = "block";
+      document.getElementById("resendVerificationContainer").style.display = "none";
+    }
+  } else {
+    console.log("No user logged in");
+    handleGuestPrompt(); // Start the timer if the user is a guest
+    document.getElementById("verificationStatus").style.display = "none";
+    document.getElementById("resendVerificationContainer").style.display = "none";
+  }
+});
+
+// === UPDATED sendMessage() FUNCTION ===
+async function sendMessage() {
+  // 1) Get user & uid
+  const user = JSON.parse(localStorage.getItem("user"));
+  const uid = firebase.auth().currentUser?.uid || "guest_user"; // Use a guest UID if not logged in
+
+  // 2) Read and clear input
+  const input = document.getElementById("userInput");
+  const message = input.value.trim();
+  if (!message) return;
+  input.value = "";
+  adjustTextareaHeight();
+
+  // 3) Show chat interface if first message
+  if (!isChatActive) {
+    document.getElementById("welcomeScreen").style.display = "none";
+    document.getElementById("chatInterface").style.visibility = "visible";
+    document.body.classList.remove("welcome-screen-active");
+    isChatActive = true;
+    clearTimeout(typeEffectTimeout);
+  }
+
+  // 4) Render user message
+  const chat = document.getElementById("chat");
+  const userMsgContainer = document.createElement("div");
+  userMsgContainer.className = "chat-message-container user";
+  userMsgContainer.innerHTML = `
+    <div class="chat-avatar">You</div>
+    <div class="message">${message}</div>
+  `;
+  chat.appendChild(userMsgContainer);
+  chat.scrollTo({
+    top: chat.scrollHeight,
+    behavior: 'smooth'
+  });
+
+  // 5) Render "thinking..." placeholder
+  const thinkingMsgContainer = document.createElement("div");
+  thinkingMsgContainer.className = "chat-message-container bot";
+  thinkingMsgContainer.id = "thinking-message-container";
+  thinkingMsgContainer.innerHTML = `
+    <div class="chat-avatar">${createBrianAvatarSVG().outerHTML}</div>
+    <div class="message">Brian is thinking... <i class="fas fa-spinner fa-spin"></i></div>
+  `;
+  chat.appendChild(thinkingMsgContainer);
+  chat.scrollTo({
+    top: chat.scrollHeight,
+    behavior: 'smooth'
+  });
+
+  try {
+    // 6) Get conversation history and prepare payload
+    const sessionId = localStorage.getItem("currentSessionId") || `session_${Date.now()}`;
+    const history = await getChatHistory(sessionId, uid);
+
+    const payload = {
+      message: message,
+      history: history,
+      user_name: user?.name || "Friend"
+    };
+
+    // 7) Call Flask /chat endpoint
+    const response = await fetch("/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    const reply = data.reply;
+
+    // 8) Remove thinking placeholder
+    thinkingMsgContainer.remove();
+
+    // 9) Render bot reply wrapper
+    const botReplyContainer = document.createElement("div");
+    botReplyContainer.className = "chat-message-container bot";
+    botReplyContainer.innerHTML = `
+      <div class="chat-avatar">${createBrianAvatarSVG().outerHTML}</div>
+      <div class="message"></div>
+    `;
+    chat.appendChild(botReplyContainer);
+    const botMessageContent = botReplyContainer.querySelector(".message");
+
+    // 10) Parse & render text/code parts
+    const parts = parseReply(reply);
+    for (const part of parts) {
+      if (part.type === "text") {
+        botMessageContent.innerHTML = marked.parse(part.content);
+        const ts = document.createElement("div");
+        ts.className = "message-timestamp";
+        ts.textContent = new Date().toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        botMessageContent.appendChild(ts);
+      } else if (part.type === "code") {
+        await createToolOutputBox(chat, part.lang, part.content, botReplyContainer);
+      }
+    }
+    chat.scrollTo({
+      top: chat.scrollHeight,
+      behavior: 'smooth'
+    });
+
+    // 11) Save to Firestore
+    if (uid !== "guest_user") {
+      if (!localStorage.getItem("currentSessionId")) {
+        localStorage.setItem("currentSessionId", sessionId);
+        await firebase.firestore()
+          .collection("users").doc(uid)
+          .collection("sessions").doc(sessionId)
+          .set({
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+      }
+
+      await firebase.firestore()
+        .collection("users").doc(uid)
+        .collection("sessions").doc(sessionId)
+        .collection("messages")
+        .add({
+          question: message,
+          answer: reply,
+          timestamp: new Date(),
+          role: "user"
+        });
+    }
+
+    console.log("✅ Chat saved under session:", sessionId);
+
+  } catch (err) {
+    console.error("Fetch error:", err);
+    const errContainer = document.getElementById("thinking-message-container") || (() => {
+      const e = document.createElement("div");
+      e.className = "chat-message-container bot";
+      chat.appendChild(e);
+      return e;
+    })();
+    errContainer.innerHTML = `
+      <div class="chat-avatar">${createBrianAvatarSVG().outerHTML}</div>
+      <div class="message" style="color:red">Error: ${err.message}</div>
+    `;
+    chat.scrollTo({
+      top: chat.scrollHeight,
+      behavior: 'smooth'
+    });
+  }
+}
+
+// A new function to check if the user is a guest and start/stop the timer
+function checkGuestStatus(user) {
+    isGuest = !user;
+    if (isGuest) {
+        startGuestTimer();
+    } else {
+        stopGuestTimer();
+    }
+}
+
+// New functions for the guest prompt box
+function showGuestPrompt(message) {
+    const box = document.getElementById("guestPromptBox");
+    document.getElementById("guestPromptMessage").innerText = message;
+    box.style.display = "flex";
+}
+
+function hideGuestPrompt() {
+    document.getElementById("guestPromptBox").style.display = "none";
+}
+
+
 
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 
@@ -132,7 +357,7 @@ function updateUserProfileUI(user) {
         // User is logged in, update UI with their info
         document.getElementById("profileName").innerText = user.displayName || user.email; // Use name or email
         document.getElementById("profileEmail").innerText = user.email;
-        document.querySelector(".profile-picture").src = user.photoURL || 'https://via.placeholder.com/60'; // Use user's photo or a default
+        document.querySelector(".profile-picture").src = user.photoURL || '/static/default_profile.png';
         document.getElementById("greeting").innerText = `Hi ${user.displayName || "there"}!`;
         document.getElementById("profileVerificationStatus").style.display = "block";
     } else {
@@ -145,26 +370,6 @@ function updateUserProfileUI(user) {
     }
 }
 
-// Your auth state listener should call this new function
-auth.onAuthStateChanged((user) => {
-    updateUserProfileUI(user); // Call the new function here
-
-    if (user) {
-        console.log("User logged in:", user.email);
-        // Display the correct verification status
-        if (!user.emailVerified) {
-            document.getElementById("resendVerificationContainer").style.display = "block";
-            document.getElementById("verificationStatus").style.display = "none";
-        } else {
-            document.getElementById("verificationStatus").style.display = "block";
-            document.getElementById("resendVerificationContainer").style.display = "none";
-        }
-    } else {
-        console.log("No user logged in");
-        document.getElementById("verificationStatus").style.display = "none";
-        document.getElementById("resendVerificationContainer").style.display = "none";
-    }
-});
 /*Changes here end I changed auth.onAuth and updateUserProfileUI(user)*/
     // login box
     let isSignup = false;
@@ -193,28 +398,34 @@ function toggleAuthMode() {
     nameGroup.style.display = "none";
   }
 }
-function showNotification(message) {
-  const box = document.getElementById("notificationBox");
-  const text = document.getElementById("notificationMessage");
-  text.textContent = message;
-  box.style.display = "flex";
 
-  // Auto-hide after 4 seconds
-  setTimeout(() => {
-    hideNotification();
-  }, 4000);
+function showNotification(message, type = "success") {
+    const notificationBox = document.getElementById("notificationBox");
+    const notificationMessage = document.getElementById("notificationMessage");
+
+    // Remove any previous type classes
+    notificationBox.classList.remove('success', 'warning', 'error');
+
+    // Add the new type class
+    notificationBox.classList.add(type);
+    
+    notificationMessage.textContent = message;
+    notificationBox.style.transform = "translateY(0)"; // Slide in
+    setTimeout(() => {
+        hideNotification();
+    }, 5000); // Hide after 5 seconds
 }
 
 function hideNotification() {
   const box = document.getElementById("notificationBox");
-  box.style.display = "none";
+  box.style.transform = "translateY(-100px)"; // This will smoothly slide the box out of view
 }
 
 /* new changes start */
 // Change this function to send the verification email
 function sendVerificationEmail(user) {
     user.sendEmailVerification().then(() => {
-        showNotification("Verification email sent! Please check your inbox.", "yellow");
+        showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning");
     }).catch((error) => {
         console.error("Error sending verification email:", error);
         showNotification("Failed to send verification email. Please try again.", "red");
@@ -225,9 +436,14 @@ function sendVerificationEmail(user) {
 function resendVerification() {
     const user = auth.currentUser;
     if (user) {
-        sendVerificationEmail(user);
+        user.sendEmailVerification().then(() => {
+            showNotification("Verification email sent! Please check your inbox.", "warning"); // Yellow for warning
+        }).catch((error) => {
+            console.error("Error sending verification email:", error);
+            showNotification("Failed to send verification email. Please try again.", "error"); // Red for error
+        });
     } else {
-        showNotification("No user logged in to resend verification to.", "red");
+        showNotification("No user logged in to resend verification to.", "error"); // Red for error
     }
 }
 /* new changes end */
@@ -237,21 +453,14 @@ function resendVerification() {
 function signInWithGoogle() {
     firebase.auth().signInWithPopup(googleProvider)
     .then((result) => {
-        // The signed-in user info.
         const user = result.user;
         console.log("Google user signed in:", user);
-        
-        // You can now close the modal and show a success message
         closeAuthModal();
-        showNotification(`Welcome, ${user.displayName}! You're logged in. 😊`, "green");
-
-        // The user's email is automatically verified with Google sign-in
-        // You don't need to manually check or send a verification email.
+        showNotification(`Welcome, ${user.displayName}! You're logged in. 😊`, "success"); // Green for success
     })
     .catch((error) => {
-        // Handle Errors here.
         console.error("Google sign-in error:", error);
-        showNotification("Failed to sign in with Google. Please try again.", "red");
+        showNotification("Failed to sign in with Google. Please try again.", "error"); // Red for error
     });
 }
 // new changes end
@@ -262,24 +471,17 @@ async function submitAuth() {
   const password = document.getElementById("authPassword").value;
 
   if (!email || !password || (isSignup && !name)) {
-    showNotification("Please fill all required fields.");
+    showNotification("Please fill all required fields.", "error"); // Red for error
     return;
   }
 
   try {
     if (isSignup) {
-      // Sign up logic
       const userCredential = await auth.createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
-
-      // Send verification email and show a yellow notification
       await user.sendEmailVerification();
-      showNotification(`Verification email sent to ${email}. Please check your inbox.`, "yellow");
-      
-      // Update profile with name
+      showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning"); // Yellow for warning
       await user.updateProfile({ displayName: name });
-      
-      // Save user data to localStorage
       localStorage.setItem("user", JSON.stringify({
         name: name,
         email: email,
@@ -291,27 +493,18 @@ async function submitAuth() {
           voice: "Male"
         }
       }));
-
       document.getElementById("resendVerificationContainer").style.display = "block";
       document.getElementById("verificationStatus").style.display = "none";
-      toggleAuthMode(); // Switch back to login after signup
-
+      toggleAuthMode();
     } else {
-      // Login logic
       const userCredential = await auth.signInWithEmailAndPassword(email, password);
       const user = userCredential.user;
-
-      // === CRITICAL FIX: Check if the email is verified ===
       if (!user.emailVerified) {
-        // Log the user out immediately so they cannot access the chat
         await auth.signOut();
-        showNotification("Please verify your email first. Check your inbox and click the verification link.", "red");
-        // We can also show the resend button here
+        showNotification("Please verify your email first. Check your inbox and click the verification link.", "error"); // Red for error
         document.getElementById("resendVerificationContainer").style.display = "block";
         return;
       }
-      
-      // If the email is verified, proceed with a normal login
       localStorage.setItem("user", JSON.stringify({
         name: user.displayName || "Anonymous",
         email: email,
@@ -323,17 +516,15 @@ async function submitAuth() {
           voice: "Male"
         }
       }));
-      
       updateUserProfileUI({ name: user.displayName, email });
       closeAuthModal();
-      showNotification("Login successful! Welcome back. 😊", "green"); // You can use a green notification for a successful login.
+      showNotification("Login successful! Welcome back. 😊", "success"); // Green for success
     }
   } catch (error) {
     console.error("Auth error:", error);
-    showNotification(formatFirebaseError(error));
+    showNotification(formatFirebaseError(error), "error"); // Red for error
   }
 }
-
 /* new changes here */
 
 function checkEmailVerification(user) {
@@ -351,20 +542,26 @@ function checkEmailVerification(user) {
 }
 
 function formatFirebaseError(error) {
-  switch (error.code) {
-    case "auth/email-already-in-use":
-      return "Email already in use. Please login instead.";
-    case "auth/user-not-found":
-      return "Email not found. Please sign up first.";
-    case "auth/wrong-password":
-      return "Incorrect password.";
-    case "auth/too-many-requests":
-      return "Too many attempts. Try again later.";
-    // case "auth/email-not-verified":
-    //   return "Please verify your email first.";
-    default:
-      return error.message;
-  }
+    switch (error.code) {
+        case "auth/email-already-in-use":
+            return "Email already in use. Please login instead.";
+        case "auth/requires-recent-login":
+            return "Session expired. Please login again.";
+        case "auth/user-not-found":
+            return "Email not found. Please sign up first.";
+        case "auth/wrong-password":
+            return "Incorrect password.";
+        case "auth/too-many-requests":
+            return "Too many attempts. Try again later.";
+        case "auth/email-not-verified":
+            return "Please verify your email first.";
+        case "auth/invalid-email":
+            return "The email address is badly formatted.";
+        case "auth/invalid-credential":
+            return "Incorrect email or password.";
+        default:
+            return error.message;
+    }
 }
 
 // Add this to your formatFirebaseError function
@@ -819,142 +1016,6 @@ function adjustTextareaHeight() {
         }
         return parts;
     }
-    //  control response
-async function sendMessage() {
-  // 1) Get user & uid
-  const user = JSON.parse(localStorage.getItem("user"));
-  const uid = firebase.auth().currentUser?.uid;
-  if (!uid) {
-    alert("Please log in!");
-    return;
-  }
-
-  // 2) Read and clear input
-  const input = document.getElementById("userInput");
-  const message = input.value.trim();
-  if (!message) return;
-  input.value = "";
-  adjustTextareaHeight();
-
-  // 3) Show chat interface if first message
-  if (!isChatActive) {
-    document.getElementById("welcomeScreen").style.display = "none";
-    document.getElementById("chatInterface").style.visibility = "visible";
-    document.body.classList.remove("welcome-screen-active");
-    isChatActive = true;
-    clearTimeout(typeEffectTimeout);
-  }
-
-  // 4) Render user message
-  const chat = document.getElementById("chat");
-  const userMsgContainer = document.createElement("div");
-  userMsgContainer.className = "chat-message-container user";
-  userMsgContainer.innerHTML = `
-    <div class="chat-avatar">You</div>
-    <div class="message">${message}</div>
-  `;
-  chat.appendChild(userMsgContainer);
-  chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
-
-  // 5) Render "thinking..." placeholder
-  const thinkingMsgContainer = document.createElement("div");
-  thinkingMsgContainer.className = "chat-message-container bot";
-  thinkingMsgContainer.id = "thinking-message-container";
-  thinkingMsgContainer.innerHTML = `
-    <div class="chat-avatar">${createBrianAvatarSVG().outerHTML}</div>
-    <div class="message">Brian is thinking... <i class="fas fa-spinner fa-spin"></i></div>
-  `;
-  chat.appendChild(thinkingMsgContainer);
-  chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
-
-  try {
-    // 6) Get conversation history and prepare payload
-    const sessionId = localStorage.getItem("currentSessionId") || `session_${Date.now()}`;
-    const history = await getChatHistory(sessionId, uid);
-    
-    // ADDED: Include user's name in payload
-    const payload = {
-      message: message,
-      history: history,
-      user_name: user?.name || "Friend"  // Default to "Friend" if no name
-    };
-
-    // 7) Call Flask /chat endpoint
-    const response = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const data = await response.json();
-    const reply = data.reply;
-
-    // 8) Remove thinking placeholder
-    thinkingMsgContainer.remove();
-
-    // 9) Render bot reply wrapper
-    const botReplyContainer = document.createElement("div");
-    botReplyContainer.className = "chat-message-container bot";
-    botReplyContainer.innerHTML = `
-      <div class="chat-avatar">${createBrianAvatarSVG().outerHTML}</div>
-      <div class="message"></div>
-    `;
-    chat.appendChild(botReplyContainer);
-    const botMessageContent = botReplyContainer.querySelector(".message");
-
-    // 10) Parse & render text/code parts
-    const parts = parseReply(reply);
-    for (const part of parts) {
-      if (part.type === "text") {
-        botMessageContent.innerHTML = marked.parse(part.content);
-        // add timestamp
-        const ts = document.createElement("div");
-        ts.className = "message-timestamp";
-        ts.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        botMessageContent.appendChild(ts);
-      } else if (part.type === "code") {
-        await createToolOutputBox(chat, part.lang, part.content, botReplyContainer);
-      }
-    }
-    chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
-
-    // 11) Save to Firestore
-    if (!localStorage.getItem("currentSessionId")) {
-      localStorage.setItem("currentSessionId", sessionId);
-      await firebase.firestore()
-        .collection("users").doc(uid)
-        .collection("sessions").doc(sessionId)
-        .set({ createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    }
-
-    await firebase.firestore()
-      .collection("users").doc(uid)
-      .collection("sessions").doc(sessionId)
-      .collection("messages")
-      .add({
-        question: message,
-        answer: reply,
-        timestamp: new Date(),
-        role: "user"
-      });
-      
-    console.log("✅ Chat saved under session:", sessionId);
-
-  } catch (err) {
-    console.error("Fetch error:", err);
-    const errContainer = document.getElementById("thinking-message-container") || (() => {
-      const e = document.createElement("div");
-      e.className = "chat-message-container bot";
-      chat.appendChild(e);
-      return e;
-    })();
-    errContainer.innerHTML = `
-      <div class="chat-avatar">${createBrianAvatarSVG().outerHTML}</div>
-      <div class="message" style="color:red">Error: ${err.message}</div>
-    `;
-    chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
-  }
-  
-}
 
 // Add this new helper function right after sendMessage()
 async function getChatHistory(sessionId, uid) {
