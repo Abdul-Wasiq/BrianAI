@@ -489,8 +489,9 @@ if (isSignup) {
     await user.updateProfile({
         displayName: name
     });
+    
+    // Toggle to login mode so the user can try to log in
     toggleAuthMode();
-
 } else {
     // This is the login block
     const userCredential = await auth.signInWithEmailAndPassword(email, password);

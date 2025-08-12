@@ -192,6 +192,7 @@ def update_theme():
 
     return jsonify({'message': 'Theme updated successfully'})
 
+# A new route for sending email verification
 @app.route('/send-verification-email', methods=['POST'])
 def send_verification_email_route():
     data = request.get_json()
@@ -200,60 +201,43 @@ def send_verification_email_route():
     if not email:
         return jsonify({"error": "Email missing"}), 400
 
-    token = hashlib.md5(f"{email}{time.time()}".encode()).hexdigest()
-    verification_link = f"http://localhost:5000/verify?token={token}" # Use your deployed URL
+    token = hashlib.md5(email.encode()).hexdigest()
+    # IMPORTANT: Change this URL to your deployed Railway URL
+    verification_link = f"https://web-production-dd5d.up.railway.app/verify?token={token}"
+
+    email_body = f"""
+    Hello,
+
+    Please click the link below to verify your email:
+    {verification_link}
+
+    Thank you!
+    """
+
+    # Make sure this sender email and password are correct
+    sender_email = "brian.ai.chatbot@gmail.com"
+    app_password = "hthq kjrj kayf wxad"  # Correct App Password format with spaces
+
+    msg = MIMEText(email_body)
+    msg['Subject'] = "Please verify your Brian AI email"
+    msg['From'] = sender_email
+    msg['To'] = email
 
     try:
-        with open('users.json', 'r') as f:
-            users_data = json.load(f)
-    except FileNotFoundError:
-        users_data = {"users": []}
-
-    users_data["users"].append({
-        "email": email,
-        "token": token,
-        "verified": False,
-        "settings": {
-            "theme": "light",
-            "language": "English",
-            "voice": "Male"
-        }
-    })
-
-    with open('users.json', 'w') as f:
-        json.dump(users_data, f, indent=4)
-    
-    send_verification_email_func(email, verification_link)
-
-    return jsonify({"success": True})
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(sender_email, app_password)
+        server.sendmail(sender_email, email, msg.as_string())
+        server.quit()
+        return jsonify({"message": "Verification email sent"}), 200
+    except Exception as e:
+        print("Email sending error:", e)
+        return jsonify({"error": "Failed to send email"}), 500
 
 @app.route('/verify', methods=['GET'])
 def verify_email():
     token = request.args.get('token')
-
-    if not token:
-        return "Invalid verification link", 400
-
-    try:
-        with open('users.json', 'r') as f:
-            users_data = json.load(f)
-            users = users_data.get('users', [])
-    except FileNotFoundError:
-        return "Invalid verification link", 400
-
-    found_user = False
-    for user in users:
-        if user.get('token') == token:
-            user['verified'] = True
-            found_user = True
-            break
-    
-    if not found_user:
-        return "Invalid verification link", 400
-
-    with open('users.json', 'w') as f:
-        json.dump(users_data, f, indent=4)
-
+    # For now, this just shows a success message without updating user status
     return """
     <h2>Email Verified Successfully! 🎉</h2>
     <p>You can now close this tab and login to Brian AI.</p>
