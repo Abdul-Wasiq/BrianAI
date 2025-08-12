@@ -1474,7 +1474,7 @@ body.dark-mode .message-timestamp {
         margin: 0;
     }
     
-    .chat-message-container {
+    /* .chat-message-container {
         margin-bottom: 20px;
         display: flex;
         flex-wrap: nowrap;
@@ -1486,7 +1486,19 @@ body.dark-mode .message-timestamp {
         max-width: 100%; 
         line-height: 1.5;
         word-break: break-word;
+    } */
+   /* temporary, original is commented */
+    .chat-message-container {
+        margin-bottom: 12px !important;
+        padding: 0 !important;
     }
+    
+    /* Remove extra space around messages */
+    .message {
+        padding: 8px 12px !important;
+        margin: 0 !important;
+    }
+
     .bot .chat-avatar {
         display: none !important;
     }
