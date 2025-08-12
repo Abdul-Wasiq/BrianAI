@@ -28,7 +28,7 @@ app.template_folder = 'templates'
 # --- Email Configuration ---
 # Store these securely in environment variables if you deploy
 EMAIL_ADDRESS = 'brian.ai.chatbot@gmail.com' 
-EMAIL_PASSWORD = 'YOUR_GENERATED_APP_PASSWORD'  # <-- Paste your new 16-digit password here
+EMAIL_PASSWORD = 'hthq kjrj kayf wxad'  # <-- Paste your new 16-digit password here
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
