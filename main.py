@@ -1,4 +1,4 @@
-# We are using these libraries
+#We are using these libraries
 # Flask for interacting with html
 # and we are importing classes and functions from flask
 # requests library is used for handling chat bot API
@@ -13,6 +13,7 @@ import re
 import os
 import hashlib # For creating MD5 hash needed for the email picture URL
 from flask import send_from_directory
+import hashlib 
 import smtplib
 from email.mime.text import MIMEText
 
@@ -24,29 +25,6 @@ API_KEY = "AIzaSyDu8l2F6k_904gaxg0YYGVRQzm9pjoemyI"
 
 app.static_folder = 'static'
 app.template_folder = 'templates'
-
-# --- Email Configuration ---
-# Store these securely in environment variables if you deploy
-EMAIL_ADDRESS = 'brian.ai.chatbot@gmail.com' 
-EMAIL_PASSWORD = 'hthq kjrj kayf wxad'  # <-- Paste your new 16-digit password here
-SMTP_SERVER = 'smtp.gmail.com'
-SMTP_PORT = 587
-
-def send_verification_email(to_email, verification_link):
-    """Sends a verification email using a Gmail SMTP server."""
-    msg = MIMEText(f"Please verify your email by clicking this link: {verification_link}")
-    msg['Subject'] = 'Verify your email for Brian AI'
-    msg['From'] = EMAIL_ADDRESS
-    msg['To'] = to_email
-
-    try:
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()  # Secure the connection
-            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-            server.send_message(msg)
-            print("Verification email sent successfully.")
-    except Exception as e:
-        print(f"Error sending email: {e}")
 
 @app.route('/static/<path:filename>')
 def static_files(filename):
@@ -121,7 +99,7 @@ SYSTEM_PROMPT = {
         "Brian: \"Let's solve this, *{user_name}*! 💻 Here's how:\n"
         "```html\n"
         "<div style='margin: 0 auto'>\n"
-        "   \n"
+        "  <!-- Center-aligned like a perfect samosa 🥟 -->\n"
         "</div>\n"
         "```\""
     )
@@ -189,7 +167,7 @@ def chat():
         print("===== RAW REPLY FROM GEMINI =====")
         print(reply)
         print("=============================")
-    
+   
         reply = re.sub(r"^\s*(SYSTEM|USER|ASSISTANT):\s*", "", reply)
 
         return jsonify({"reply": reply})
@@ -223,20 +201,41 @@ def update_theme():
 
     return jsonify({'message': 'Theme updated successfully'})
 
-# A new route for sending email verification
+# Remove the reset-context endpoint since we're not using global messages anymore
 @app.route('/send-verification-email', methods=['POST'])
-def send_verification_email_route():
+def send_verification_email():
     data = request.get_json()
     email = data.get('email')
-    
-    # In a real app, you would generate a unique verification token here
-    verification_link = "http://your-app-url/verify?token=exampletoken" 
-    
-    send_verification_email(email, verification_link)
-    
-    return jsonify({"success": True})
 
-# Remove the reset-context endpoint since we're not using global messages anymore
+    if not email:
+        return jsonify({"success": False, "error": "Email is required"}), 400
+
+    try:
+        # Gmail credentials (use your App Password, not normal password)
+        sender_email = "brianai.team@gmail.com"
+        app_password = "hthq kjrj kayf wxad"
+
+        subject = "Please verify your email"
+        verification_link = f"https://yourwebsite.com/verify?email={email}"
+        body = f"Hello,\n\nPlease click the link below to verify your email:\n{verification_link}\n\nThank you!"
+
+        # Create email
+        msg = MIMEText(body)
+        msg["Subject"] = subject
+        msg["From"] = sender_email
+        msg["To"] = email
+
+        # Send email via Gmail SMTP
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(sender_email, app_password)
+            server.sendmail(sender_email, email, msg.as_string())
+
+        return jsonify({"success": True, "message": "Verification email sent!"})
+
+    except Exception as e:
+        print("Email send error:", e)
+        return jsonify({"success": False, "error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run()
+    
