@@ -13,14 +13,6 @@ import re
 import os
 import hashlib # For creating MD5 hash needed for the email picture URL
 from flask import send_from_directory
-import smtplib
-from email.mime.text import MIMEText
-import firebase_admin
-from firebase_admin import auth, credentials
-
-# Initialize Firebase Admin SDK once
-cred = credentials.Certificate("path/to/your-firebase-adminsdk.json")
-firebase_admin.initialize_app(cred)
 
 
 # ... (import statements remain the same)
@@ -206,6 +198,8 @@ def update_theme():
         json.dump({ "users": users }, f, indent=4)
 
     return jsonify({'message': 'Theme updated successfully'})
+
+# Remove the reset-context endpoint since we're not using global messages anymore
 
 if __name__ == "__main__":
     app.run()
