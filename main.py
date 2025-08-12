@@ -201,40 +201,67 @@ def update_theme():
 
     return jsonify({'message': 'Theme updated successfully'})
 
-# Remove the reset-context endpoint since we're not using global messages anymore
+
 @app.route('/send-verification-email', methods=['POST'])
 def send_verification_email():
     data = request.get_json()
     email = data.get('email')
 
     if not email:
-        return jsonify({"success": False, "error": "Email is required"}), 400
+        return {"error": "Email missing"}, 400
+
+    # Generate a simple token (for example, hash of the email)
+    token = hashlib.md5(email.encode()).hexdigest()
+
+    # Create your verification link with your deployed URL and token
+    verification_link = f"https://web-production-dd5d.up.railway.app/verify?token={token}"
+
+    # Email content - customize as you want
+    email_body = f"""
+    Hello,
+
+    Please click the link below to verify your email:
+    {verification_link}
+
+    Thank you!
+    """
+
+    # Set up email sending (using your brianai.team@gmail.com and app password)
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+    sender_email = "brianai.team@gmail.com"
+    app_password = "hthqkjrjkayfwxad"  # Your app password here
+
+    msg = MIMEText(email_body)
+    msg['Subject'] = "Please verify your Brian AI email"
+    msg['From'] = sender_email
+    msg['To'] = email
 
     try:
-        # Gmail credentials (use your App Password, not normal password)
-        sender_email = "brianai.team@gmail.com"
-        app_password = "hthq kjrj kayf wxad"
-
-        subject = "Please verify your email"
-        verification_link = f"https://yourwebsite.com/verify?email={email}"
-        body = f"Hello,\n\nPlease click the link below to verify your email:\n{verification_link}\n\nThank you!"
-
-        # Create email
-        msg = MIMEText(body)
-        msg["Subject"] = subject
-        msg["From"] = sender_email
-        msg["To"] = email
-
-        # Send email via Gmail SMTP
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(sender_email, app_password)
-            server.sendmail(sender_email, email, msg.as_string())
-
-        return jsonify({"success": True, "message": "Verification email sent!"})
-
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(sender_email, app_password)
+        server.sendmail(sender_email, email, msg.as_string())
+        server.quit()
+        return {"message": "Verification email sent"}, 200
     except Exception as e:
-        print("Email send error:", e)
-        return jsonify({"success": False, "error": str(e)}), 500
+        print("Email sending error:", e)
+        return {"error": "Failed to send email"}, 500
+
+@app.route('/verify', methods=['GET'])
+def verify_email():
+    token = request.args.get('token')
+
+    if not token:
+        return "Invalid verification link", 400
+
+    # In real app, lookup user by token and mark verified in DB or user data
+    # Here for demo, just show success message
+
+    return """
+    <h2>Email Verified Successfully! 🎉</h2>
+    <p>You can now close this tab and login to Brian AI.</p>
+    """
 
 if __name__ == "__main__":
     app.run()
