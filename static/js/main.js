@@ -475,13 +475,19 @@ async function submitAuth() {
 
     try {
         if (isSignup) {
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-            const user = userCredential.user;
-            await user.sendEmailVerification();
-            showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning");
-            await user.updateProfile({
-                displayName: name
-            });
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    
+    // Call the Flask backend to send the email
+    fetch('/send-verification-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+    });
+    showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning");
+    await user.updateProfile({
+        displayName: name
+    });
             localStorage.setItem("user", JSON.stringify({
                 name: name,
                 email: email,
