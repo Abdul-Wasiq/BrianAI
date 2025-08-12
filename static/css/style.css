@@ -1235,14 +1235,14 @@ body.dark-mode .message-timestamp {
     position: fixed;
     top: 20px;
     right: 20px;
-    background-color: var(--success-color); /* Default color is green */
+    background-color: var(--success-color);
     color: white;
     padding: 15px 25px;
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 2000;
+    z-index: 9999; /* Set a very high z-index to be on top of everything */
     transition: transform 0.3s ease-in-out;
-    transform: translateY(-100px); /* This hides the box by default */
+    transform: translateY(-100px);
 }
 
 /* New CSS classes for different notification types */
