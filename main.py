@@ -19,12 +19,13 @@ app.static_folder = 'static'
 app.template_folder = 'templates'
 
 # --- Email Configuration ---
-EMAIL_ADDRESS = 'brian.ai.chatbot@gmail.com'
-EMAIL_PASSWORD = 'hthq kjrj kayf wxad'
+EMAIL_ADDRESS = 'brianai.team@gmail.com'
+EMAIL_PASSWORD = 'mtvo yuqd vtqf ornp'
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
 def send_verification_email_func(to_email, verification_link):
+    """Sends a verification email using a Gmail SMTP server."""
     msg = MIMEText(f"Hello,\n\nPlease click the link to verify your email:\n{verification_link}\n\nThanks,\nBrian AI Team")
     msg['Subject'] = 'Verify your email for Brian AI'
     msg['From'] = EMAIL_ADDRESS
