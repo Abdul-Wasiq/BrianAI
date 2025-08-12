@@ -474,66 +474,48 @@ async function submitAuth() {
     }
 
     try {
-        if (isSignup) {
+        // main.js
+if (isSignup) {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     const user = userCredential.user;
-//     await fetch("/send-verification-email", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ email: email })
-// });
+
+    fetch("/send-verification-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email })
+    });
     
-    // Call the Flask backend to send the email
-    // fetch('/send-verification-email', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ email: email })
-    // });
     showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning");
     await user.updateProfile({
         displayName: name
     });
-            localStorage.setItem("user", JSON.stringify({
-                name: name,
-                email: email,
-                uid: user.uid,
-                verified: false,
-                settings: {
-                    theme: "light",
-                    language: "English",
-                    voice: "Male"
-                }
-            }));
-            document.getElementById("resendVerificationContainer").style.display = "block";
-            document.getElementById("verificationStatus").style.display = "none";
-            toggleAuthMode();
-        } else {
-            const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            const user = userCredential.user;
-            // if (!user.emailVerified) {
-            //     await auth.signOut();
-            //     showNotification("Please verify your email first. Check your inbox and click the verification link.", "error");
-            //     document.getElementById("resendVerificationContainer").style.display = "block";
-            //     return;
-            // }
-            localStorage.setItem("user", JSON.stringify({
-                name: user.displayName || "Anonymous",
-                email: email,
-                uid: user.uid,
-                verified: true,
-                settings: {
-                    theme: "light",
-                    language: "English",
-                    voice: "Male"
-                }
-            }));
-            updateUserProfileUI({
-                name: user.displayName,
-                email
-            });
-            closeAuthModal();
-            showNotification("Login successful! Welcome back. 😊", "success");
+    toggleAuthMode();
+
+} else {
+    // This is the login block
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+
+    // The user can log in without being verified in this version.
+    
+    localStorage.setItem("user", JSON.stringify({
+        name: user.displayName || "Anonymous",
+        email: email,
+        uid: user.uid,
+        verified: true, // Assuming true since we removed the check
+        settings: {
+            theme: "light",
+            language: "English",
+            voice: "Male"
         }
+    }));
+    updateUserProfileUI({
+        name: user.displayName,
+        email
+    });
+    closeAuthModal();
+    showNotification("Login successful! Welcome back. 😊", "success");
+}
     } catch (error) {
         console.error("Auth error:", error);
         showNotification(formatFirebaseError(error), "error");
