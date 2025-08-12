@@ -478,7 +478,12 @@ async function submitAuth() {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    await user.sendEmailVerification();
+    await fetch("/send-verification-email", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: email })
+});
+
 
     
     // Call the Flask backend to send the email
