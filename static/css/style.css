@@ -204,7 +204,7 @@ body.dark-mode .sidebar-base:not(.expanded):hover {
     white-space: nowrap;
 }
 .title {
-    margin-right: 350px;
+    margin-right: 0px;
 }
 .login_button {
     background-color: #1E90FF; /* Dodger Blue */
@@ -1487,6 +1487,19 @@ body.dark-mode .message-timestamp {
         line-height: 1.5;
         word-break: break-word;
     }
+    .bot .chat-avatar {
+        display: none !important;
+    }
+    .bot .message {
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        padding: 10px 15px !important;
+    }
+
+    .user .message {
+        margin-right: 0 !important;
+    }
+
     
 
     .user {
