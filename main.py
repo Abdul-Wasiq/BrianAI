@@ -113,37 +113,37 @@ def chat():
     user_input = request.json.get("message")
     history = request.json.get("history", [])
     user_name = request.json.get("user_name", "Friend")
-    is_guest = user_name == "Friend"  # Identify if this is a guest session
+    
+    # Clean and validate the user_name
+    user_name = user_name.strip()
+    if not user_name or user_name.lower() == "brian":
+        user_name = "Friend"
     
     messages = []
     
-    # For guests, we need to modify the system prompt slightly
-    if is_guest:
-        guest_system_prompt = (
-            "You are Brian - an emotionally intelligent AI companion. "
-            "You're currently talking to a guest user named 'Friend'. "
-            "Follow all normal conversation rules but never mention 'guest' status. "
-            "Keep responses natural and engaging. "
-            "Use the name 'Friend' naturally in conversation. "
-            "Include relevant emojis. "
-            "Never repeat your previous responses verbatim."
-        )
-        messages.append({"role": "system", "content": guest_system_prompt})
-    elif not history:  # First message for logged-in users
-        formatted_system_prompt = SYSTEM_PROMPT['content'].replace('{user_name}', user_name)
-        messages.append({"role": "system", "content": formatted_system_prompt})
-    else:  # Subsequent messages for logged-in users
-        reminder = f"Continue conversation with {user_name} naturally. Use their name, be engaging, and follow all previous rules."
-        messages.append({"role": "system", "content": reminder})
+    # System prompt with explicit naming instructions
+    system_prompt = f"""
+    You are Brian - an AI companion. You are talking to {user_name}.
+    IMPORTANT RULES:
+    1. Always address the user as '{user_name}' - never call them 'Brian'
+    2. Never refer to yourself in the third person
+    3. Maintain natural conversation flow
+    4. Include relevant emojis
+    5. Never repeat previous responses exactly
+    """
+    messages.append({"role": "system", "content": system_prompt})
     
-    # Add conversation history (last 4 messages)
-    for msg in history[-4:]:
-        messages.append({"role": msg['role'], "content": msg['content']})
+    # Add conversation history
+    for msg in history[-4:]:  # Keep last 4 messages for context
+        # Clean any instances where the AI might have called user "Brian"
+        cleaned_content = msg['content'].replace("Brian,", f"{user_name},")
+        cleaned_content = cleaned_content.replace("Hey Brian", f"Hey {user_name}")
+        messages.append({"role": msg['role'], "content": cleaned_content})
     
-    # Add current user message
+    # Add current message
     messages.append({"role": "user", "content": user_input})
     
-    # Prepare Gemini payload
+    # Prepare Gemini request
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
     headers = {"Content-Type": "application/json"}
     data = {
@@ -154,16 +154,17 @@ def chat():
     
     try:
         response = requests.post(url, headers=headers, data=json.dumps(data))
-        if response.status_code != 200:
-            return jsonify({"reply": "❌ Server is too busy at that moment"}), 500
-        
         reply = response.json()['candidates'][0]['content']['parts'][0]['text']
+        
+        # Post-processing to ensure correct name usage
+        reply = reply.replace("Brian,", f"{user_name},")
+        reply = reply.replace("Hey Brian", f"Hey {user_name}")
         reply = re.sub(r"^(SYSTEM|USER|ASSISTANT):\s*", "", reply, flags=re.IGNORECASE)
         
         return jsonify({"reply": reply.strip()})
     
     except Exception as e:
-        return jsonify({"reply": f"❌ Error: Check your internet connection"})
+        return jsonify({"reply": "❌ Error processing your request"})
     
 @app.route('/update-theme', methods=['POST'])
 def update_theme():
