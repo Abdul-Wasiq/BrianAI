@@ -1356,6 +1356,39 @@ body.dark-mode .message-timestamp {
     white-space: nowrap;
 }
 
+.hamburger-left, 
+.hamburger-right {
+  display: none;
+}
+
+/* === PC Screen Header Fix (with proper spacing) === */
+@media screen and (min-width: 769px) {
+  .header {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    height: 30px; /* Fixed height to maintain spacing */
+    align-items: center; /* Vertically center */
+    padding-bottom: 10px; /* Maintain border distance */
+  }
+
+  .header .title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    padding: 10px 0; /* Add vertical padding */
+    margin: 0;
+    line-height: 1.2; /* Control text height */
+  }
+
+  /* Border stays properly spaced */
+  .header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px; /* Space between text and border */
+  }
+}
+
 /* ===== Mobile Responsive Fixes (Final and Polished) ===== */
 @media screen and (max-width: 768px) {
     
@@ -1377,17 +1410,23 @@ body.dark-mode .message-timestamp {
   box-sizing: border-box;
 }
 
-.hamburger-left, 
+/* .hamburger-left, 
 .hamburger-right {
   flex-shrink: 0;
-  min-width: 40px; /* Minimum space for icons */
+  min-width: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   font-size: 22px;
   color: var(--text-color);
-}
+} */
+
+@media screen and (max-width: 768px) {
+  .hamburger-left, 
+  .hamburger-right {
+    display: flex; /* Revert to original mobile styles */
+  }
 
 .header .title {
   text-align: center;
@@ -1638,4 +1677,5 @@ body.dark-mode .message-timestamp {
         min-width: 40px;      /* ensure space */
         text-align: center;
     }
+}
 }

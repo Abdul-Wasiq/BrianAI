@@ -19,8 +19,8 @@ app.static_folder = 'static'
 app.template_folder = 'templates'
 
 # --- Email Configuration ---
-EMAIL_ADDRESS = 'brianai.team@gmail.com'
-EMAIL_PASSWORD = 'mtvo yuqd vtqf ornp'
+EMAIL_ADDRESS = 'abdulwasiq651@gmail.com'
+EMAIL_PASSWORD = 'naib gwdw snnf dlmp'
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
@@ -230,7 +230,7 @@ def send_verification_email_route():
         server.login(sender_email, app_password)
         server.sendmail(sender_email, email, msg.as_string())
         server.quit()
-        return jsonify({"message": "Verification email sent"}), 200
+        return jsonify({"message": "Verification email sent" }), 200
     except Exception as e:
         print("Email sending error:", e)
         return jsonify({"error": "Failed to send email"}), 500

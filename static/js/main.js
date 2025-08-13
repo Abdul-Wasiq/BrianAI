@@ -12,7 +12,7 @@ window.resendVerification = resendVerification;
 
 // Add these variables with your other global variables at the top
 
-const PROMPT_INTERVAL_SECONDS = 5; // Change this to 300 for 5 minutes after testing.
+const PROMPT_INTERVAL_SECONDS = 300; // Change this to 300 for 5 minutes after testing.
 let guestPromptInterval = null;
 
 // === NEW GUEST PROMPT VARIABLES AND FUNCTIONS ===
@@ -425,7 +425,8 @@ function hideNotification() {
 // Change this function to send the verification email
 function sendVerificationEmail(user) {
     user.sendEmailVerification().then(() => {
-        showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning");
+        // showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning");
+        showNotification(`You can login now as ${email}`, "success");
     }).catch((error) => {
         console.error("Error sending verification email:", error);
         showNotification("Failed to send verification email. Please try again.", "red");
@@ -437,8 +438,9 @@ function resendVerification() {
     const user = auth.currentUser;
     if (user) {
         user.sendEmailVerification().then(() => {
-            showNotification("Verification email sent! Please check your inbox.", "warning"); // Yellow for warning
-        }).catch((error) => {
+            // showNotification("Verification email sent! Please check your inbox.", "warning"); // Yellow for warning
+           showNotification("You can login now", "success");
+          }).catch((error) => {
             console.error("Error sending verification email:", error);
             showNotification("Failed to send verification email. Please try again.", "error"); // Red for error
         });
@@ -485,7 +487,8 @@ if (isSignup) {
         body: JSON.stringify({ email: email })
     });
     
-    showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning");
+    // showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning");
+    showNotification(`you can login now as ${email}`, "success");
     await user.updateProfile({
         displayName: name
     });
@@ -1567,37 +1570,36 @@ async function loadChatSession(sessionId) {
 
 
 async function startNewChat() {
-  // 0) Tell your Flask backend to drop all prior messages except the system prompt
-  await fetch("/reset-context", { method: "POST" });
-
-  // 1) Clear out session data
-  localStorage.removeItem("currentSessionId");
-  currentSessionId = null;
-
-  // 2) Reset flags & clear chat DOM
-  isChatActive = false;
-  document.getElementById("chat").innerHTML = "";
-  document.getElementById("userInput").value = "";
-
-  // 3) Collapse & unlock both sidebars
+  // 0) Close both sidebars (mobile + desktop)
   const mainSidebar = document.getElementById("mainSidebar");
   const historySidebar = document.getElementById("historySidebar");
+  const overlay = document.querySelector(".sidebar-overlay");
+
+  // Mobile: Remove 'sidebar-active' class and hide overlay
+  mainSidebar.classList.remove("sidebar-active");
+  historySidebar.classList.remove("sidebar-active");
+  if (overlay) overlay.style.display = "none";
+
+  // Desktop: Collapse sidebars
   mainSidebar.classList.remove("expanded", "locked");
   historySidebar.classList.remove("expanded", "locked");
-
-  // 4) Restore body classes so sidebars stay collapsed
   document.body.classList.add("main-sidebar-collapsed", "history-sidebar-collapsed");
 
-  // 5) Show welcome screen & hide chat interface
+  // 1) Reset chat session
+  await fetch("/reset-context", { method: "POST" });
+  localStorage.removeItem("currentSessionId");
+
+  // 2) Clear chat UI
+  document.getElementById("chat").innerHTML = "";
+  document.getElementById("userInput").value = "";
+  isChatActive = false;
+
+  // 3) Show welcome screen
   document.getElementById("welcomeScreen").style.display = "flex";
   document.getElementById("chatInterface").style.visibility = "hidden";
   document.body.classList.add("welcome-screen-active");
-
-  // 6) Restart the typing animation on welcome
   startTypeEffect();
 
-  // 7) Focus the input so user can start typing right away
+  // 4) Focus input (now visible since sidebars are closed)
   document.getElementById("userInput").focus();
 }
-
-
