@@ -112,35 +112,40 @@ SYSTEM_PROMPT = {
 def chat():
     user_input = request.json.get("message")
     history = request.json.get("history", [])
-    user_name = request.json.get("user_name", "Friend")  # Defaults to "Friend" for guest users
+    user_name = request.json.get("user_name", "Friend")
     
     print(f"User name received: {user_name}")
     
     messages = []
     
-    # Always include the system prompt, but format it with the current user_name
-    formatted_system_prompt = f"SYSTEM:\n{SYSTEM_PROMPT['content'].replace('{user_name}', user_name)}"
-    messages.append({"role": "system", "content": formatted_system_prompt})
+    # Only include system prompt if it's the first message
+    if not history:
+        formatted_system_prompt = SYSTEM_PROMPT['content'].replace('{user_name}', user_name)
+        messages.append({"role": "system", "content": formatted_system_prompt})
+    else:
+        # For subsequent messages, include a reminder of the rules
+        reminder = (
+            f"Remember you are Brian talking to {user_name}. "
+            "Respond naturally to the last message only. "
+            "Use the person's name naturally. "
+            "Include relevant emojis. "
+            "Keep responses conversational but helpful."
+        )
+        messages.append({"role": "system", "content": reminder})
     
-    # Add conversation history
-    for msg in history[-4:]:  # Keep last 4 messages as context
-        role = msg['role'].upper()
-        messages.append({"role": msg['role'], "content": f"{role}: {msg['content']}"})
+    # Add conversation history (last 4 messages)
+    for msg in history[-4:]:
+        messages.append({"role": msg['role'], "content": msg['content']})
     
     # Add current user message
-    messages.append({"role": "user", "content": f"USER: {user_input}"})
+    messages.append({"role": "user", "content": user_input})
     
-    chat_text = "\n\n".join([m['content'] for m in messages])
-    
-    print("===== SENDING TO GEMINI =====")
-    print(chat_text)
-    print("=============================")
-    
+    # Prepare the payload for Gemini
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
     headers = {"Content-Type": "application/json"}
     data = {
         "contents": [{
-            "parts": [{"text": chat_text}]
+            "parts": [{"text": "\n".join([f"{m['role'].upper()}: {m['content']}" for m in messages])}]
         }]
     }
     
@@ -151,18 +156,15 @@ def chat():
             return jsonify({"reply": "❌ Server is too busy at that moment"}), 500
     
         reply = response.json()['candidates'][0]['content']['parts'][0]['text']
-        print("===== RAW REPLY FROM GEMINI =====")
-        print(reply)
-        print("=============================")
-    
-        reply = re.sub(r"^\s*(SYSTEM|USER|ASSISTANT):\s*", "", reply)
-    
+        
+        # Clean up the response
+        reply = re.sub(r"^(SYSTEM|USER|ASSISTANT):\s*", "", reply, flags=re.IGNORECASE)
+        
         return jsonify({"reply": reply})
     
     except Exception as e:
         print("Exception:", str(e))
         return jsonify({"reply": f"❌ Error: Check your internet connection"})
-    
     
 @app.route('/update-theme', methods=['POST'])
 def update_theme():
