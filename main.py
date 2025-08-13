@@ -156,11 +156,29 @@ SYSTEM_PROMPT = {
     )
 }
 
+def get_preferred_name(full_name):
+    """Extracts the preferred name (first name) from full name"""
+    # Common prefixes to ignore
+    prefixes = {'muhammad', 'md', 'mohd', 'muhammed', 'mohammad'}
+    
+    names = full_name.strip().split()
+    if not names:
+        return "Friend"
+    
+    # Check if first name is a prefix
+    first_name = names[0].lower()
+    if first_name in prefixes and len(names) > 1:
+        return names[1]  # Return the second name
+    return names[0]  # Return first name by default
+
 @app.route("/chat", methods=["POST"])
 def chat():
     user_input = request.json.get("message")
     history = request.json.get("history", [])
-    user_name = request.json.get("user_name", "Friend").strip()
+    full_name = request.json.get("user_name", "Friend").strip()
+    
+    # Get preferred name (first name or second name if first is prefix)
+    preferred_name = get_preferred_name(full_name) if full_name != "Friend" else "Friend"
     
     # Identify if this is a help-seeking question
     is_help_request = any(keyword in user_input.lower() for keyword in 
@@ -168,10 +186,26 @@ def chat():
     
     messages = []
     
-    # System prompt with dynamic instructions
-    system_prompt = SYSTEM_PROMPT['content'].replace('{user_name}', user_name)
+    # System prompt with name handling instructions
+    system_prompt = f"""
+    You are Brian - an emotionally intelligent AI companion.
+    You are talking to {full_name} (preferred name: {preferred_name}).
+    
+    NAME USAGE RULES:
+    1. First message: Use full name ("Hello {full_name}!")
+    2. Subsequent messages: Use preferred name ("{preferred_name}") naturally 1-2 times
+    3. Never begin with "Hey [Name]" after first message
+    4. Never overuse names - keep conversation natural
+    
+    RESPONSE RULES:
+    1. Provide detailed answers for help requests
+    2. Use bullet points/headings when helpful
+    3. Include relevant emojis
+    4. End with engaging question
+    """
+    
     if is_help_request:
-        system_prompt += "\n\nUSER IS ASKING FOR HELP - PROVIDE DETAILED, STRUCTURED RESPONSE"
+        system_prompt += "\n\nUSER IS ASKING FOR HELP - PROVIDE DETAILED RESPONSE"
     
     messages.append({"role": "system", "content": system_prompt})
     
@@ -194,9 +228,18 @@ def chat():
         reply = response.json()['candidates'][0]['content']['parts'][0]['text']
         reply = re.sub(r"^(SYSTEM|USER|ASSISTANT):\s*", "", reply, flags=re.IGNORECASE)
         
-        # Ensure detailed responses for help requests
-        if is_help_request and len(reply.split()) < 100:
-            reply += "\n\n[Additional details would go here...]"
+        # Post-processing for name usage
+        if not history:  # First message
+            reply = reply.replace("Hello Friend!", f"Hello {full_name}!")
+        else:
+            # Replace any awkward name repetitions
+            reply = re.sub(r"Hey\s+\w+[,!]", "", reply)  # Remove "Hey Name"
+            # Ensure preferred name appears naturally
+            if preferred_name not in reply and full_name != "Friend":
+                # Insert name at natural point
+                sentences = reply.split('.')
+                if len(sentences) > 1:
+                    reply = f"{sentences[0]}, {preferred_name}.{'.'.join(sentences[1:])}"
         
         return jsonify({"reply": reply.strip()})
     
