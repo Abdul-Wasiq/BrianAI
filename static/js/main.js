@@ -465,6 +465,7 @@ function signInWithGoogle() {
         showNotification("Failed to sign in with Google. Please try again.", "error"); // Red for error
     });
 }
+
 async function submitAuth() {
     const name = document.getElementById("authName").value;
     const email = document.getElementById("authEmail").value;
@@ -481,42 +482,54 @@ if (isSignup) {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
+    // Add these lines RIGHT AFTER user creation:
+    await user.updateProfile({
+        displayName: name  // Set the user's name immediately
+    });
+
+    // Update UI and localStorage BEFORE showing notification
+    updateUserProfileUI({
+        displayName: name,
+        email: email,
+        uid: user.uid
+    });
+    
+    localStorage.setItem("user", JSON.stringify({
+        name: name,
+        email: email,
+        uid: user.uid,
+        verified: false,
+        settings: { theme: "light" }
+    }));
+
+    // Then send verification email
     fetch("/send-verification-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email })
     });
-    
-    // showNotification(`Verification email sent to ${email}. Please check your inbox.`, "warning");
-    showNotification(`you can login now as ${email}`, "success");
-    await user.updateProfile({
-        displayName: name
-    });
-    
-    // Toggle to login mode so the user can try to log in
-    toggleAuthMode();
+
+    showNotification(`You can login now as ${email}`, "success");
+    toggleAuthMode(); // Switch to login view
 } else {
-    // This is the login block
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    // The user can log in without being verified in this version.
-    
-    localStorage.setItem("user", JSON.stringify({
-        name: user.displayName || "Anonymous",
-        email: email,
-        uid: user.uid,
-        verified: true, // Assuming true since we removed the check
-        settings: {
-            theme: "light",
-            language: "English",
-            voice: "Male"
-        }
-    }));
+    // Add these lines RIGHT AFTER login:
     updateUserProfileUI({
-        name: user.displayName,
-        email
+        displayName: user.displayName || name || "User", // Fallback chain
+        email: user.email,
+        uid: user.uid
     });
+
+    localStorage.setItem("user", JSON.stringify({
+        name: user.displayName || name || "User",
+        email: user.email,
+        uid: user.uid,
+        verified: true,
+        settings: { theme: "light" }
+    }));
+
     closeAuthModal();
     showNotification("Login successful! Welcome back. 😊", "success");
 }
