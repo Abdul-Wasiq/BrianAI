@@ -160,68 +160,48 @@ SYSTEM_PROMPT = {
 def chat():
     user_input = request.json.get("message")
     history = request.json.get("history", [])
-    user_name = request.json.get("user_name", "Friend")
+    user_name = request.json.get("user_name", "Friend").strip()
     
-    # Clean and validate the user_name
-    user_name = user_name.strip()
-    if not user_name or user_name.lower() == "brian":
-        user_name = "Friend"
+    # Identify if this is a help-seeking question
+    is_help_request = any(keyword in user_input.lower() for keyword in 
+                         ["how to", "what should", "advice", "help", "solve", "handle"])
     
     messages = []
     
-    # For first message, use the full system prompt
-    if not history:
-        formatted_system_prompt = SYSTEM_PROMPT['content'].replace('{user_name}', user_name)
-        messages.append({"role": "system", "content": formatted_system_prompt})
-    else:
-        # For subsequent messages, use a reminder with the user's name
-        reminder = (
-            f"Continue conversation with {user_name} naturally. Rules:\n"
-            f"1. Always address them as '{user_name}' (never 'Brian' or 'Friend')\n"
-            "2. Respond only to the last message\n"
-            "3. Include relevant emojis\n"
-            "4. Never repeat previous responses\n"
-            "5. Be empathetic and helpful"
-        )
-        messages.append({"role": "system", "content": reminder})
+    # System prompt with dynamic instructions
+    system_prompt = SYSTEM_PROMPT['content'].replace('{user_name}', user_name)
+    if is_help_request:
+        system_prompt += "\n\nUSER IS ASKING FOR HELP - PROVIDE DETAILED, STRUCTURED RESPONSE"
     
-    # Add conversation history (last 4 messages)
+    messages.append({"role": "system", "content": system_prompt})
+    
+    # Add conversation history
     for msg in history[-4:]:
-        # Clean any incorrect name usage in history
-        cleaned_content = msg['content']
-        if msg['role'] == 'assistant':
-            cleaned_content = cleaned_content.replace("Brian,", f"{user_name},")
-            cleaned_content = cleaned_content.replace("Hey Brian", f"Hey {user_name}")
-            cleaned_content = cleaned_content.replace("Friend", user_name)
-        messages.append({"role": msg['role'], "content": cleaned_content})
+        messages.append(msg)
     
-    # Add current user message
     messages.append({"role": "user", "content": user_input})
     
-    # Prepare Gemini request
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
-    headers = {"Content-Type": "application/json"}
-    data = {
-        "contents": [{
-            "parts": [{"text": "\n".join([f"{m['role'].upper()}: {m['content']}" for m in messages])}]
-        }]
-    }
-    
+    # Gemini API call
     try:
-        response = requests.post(url, headers=headers, data=json.dumps(data))
-        reply = response.json()['candidates'][0]['content']['parts'][0]['text']
+        response = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}",
+            headers={"Content-Type": "application/json"},
+            json={"contents": [{"parts": [{"text": "\n".join(
+                [f"{m['role'].upper()}: {m['content']}" for m in messages]
+            )}]}]}
+        )
         
-        # Post-processing to ensure correct name usage
+        reply = response.json()['candidates'][0]['content']['parts'][0]['text']
         reply = re.sub(r"^(SYSTEM|USER|ASSISTANT):\s*", "", reply, flags=re.IGNORECASE)
-        reply = reply.replace("Brian,", f"{user_name},")
-        reply = reply.replace("Hey Brian", f"Hey {user_name}")
-        reply = reply.replace("Friend", user_name)
+        
+        # Ensure detailed responses for help requests
+        if is_help_request and len(reply.split()) < 100:
+            reply += "\n\n[Additional details would go here...]"
         
         return jsonify({"reply": reply.strip()})
     
     except Exception as e:
-        print(f"Error: {str(e)}")
-        return jsonify({"reply": "❌ Error processing your request"})
+        return jsonify({"reply": "❌ Let me think differently about that..."})
     
 @app.route('/update-theme', methods=['POST'])
 def update_theme():
