@@ -112,23 +112,22 @@ SYSTEM_PROMPT = {
 def chat():
     user_input = request.json.get("message")
     history = request.json.get("history", [])
-    user_name = request.json.get("user_name", "Friend")
+    user_name = request.json.get("user_name", "Friend")  # Defaults to "Friend" for guest users
     
     print(f"User name received: {user_name}")
     
     messages = []
     
-    if not history:
-        formatted_system_prompt = f"SYSTEM:\n{SYSTEM_PROMPT['content'].replace('{user_name}', user_name)}"
-        messages.append({"role": "system", "content": formatted_system_prompt})
-    else:
-        reminder = f"SYSTEM:\nCritical: You are Brian. Respond ONLY to the message: \"{user_input}\".\n- Use {user_name}'s name naturally.\n- Answer clearly, using structure (headings, bullets, steps) if the question is complex.\n- Do NOT repeat past replies. Include 1–3 relevant emojis.\n"
-        messages.append({"role": "system", "content": reminder})
+    # Always include the system prompt, but format it with the current user_name
+    formatted_system_prompt = f"SYSTEM:\n{SYSTEM_PROMPT['content'].replace('{user_name}', user_name)}"
+    messages.append({"role": "system", "content": formatted_system_prompt})
     
-    for msg in history[-4:]:
+    # Add conversation history
+    for msg in history[-4:]:  # Keep last 4 messages as context
         role = msg['role'].upper()
         messages.append({"role": msg['role'], "content": f"{role}: {msg['content']}"})
     
+    # Add current user message
     messages.append({"role": "user", "content": f"USER: {user_input}"})
     
     chat_text = "\n\n".join([m['content'] for m in messages])
@@ -163,8 +162,8 @@ def chat():
     except Exception as e:
         print("Exception:", str(e))
         return jsonify({"reply": f"❌ Error: Check your internet connection"})
-
-
+    
+    
 @app.route('/update-theme', methods=['POST'])
 def update_theme():
     data = request.get_json()
