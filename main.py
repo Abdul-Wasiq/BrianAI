@@ -113,24 +113,27 @@ def chat():
     user_input = request.json.get("message")
     history = request.json.get("history", [])
     user_name = request.json.get("user_name", "Friend")
-    
-    print(f"User name received: {user_name}")
+    is_guest = user_name == "Friend"  # Identify if this is a guest session
     
     messages = []
     
-    # Only include system prompt if it's the first message
-    if not history:
+    # For guests, we need to modify the system prompt slightly
+    if is_guest:
+        guest_system_prompt = (
+            "You are Brian - an emotionally intelligent AI companion. "
+            "You're currently talking to a guest user named 'Friend'. "
+            "Follow all normal conversation rules but never mention 'guest' status. "
+            "Keep responses natural and engaging. "
+            "Use the name 'Friend' naturally in conversation. "
+            "Include relevant emojis. "
+            "Never repeat your previous responses verbatim."
+        )
+        messages.append({"role": "system", "content": guest_system_prompt})
+    elif not history:  # First message for logged-in users
         formatted_system_prompt = SYSTEM_PROMPT['content'].replace('{user_name}', user_name)
         messages.append({"role": "system", "content": formatted_system_prompt})
-    else:
-        # For subsequent messages, include a reminder of the rules
-        reminder = (
-            f"Remember you are Brian talking to {user_name}. "
-            "Respond naturally to the last message only. "
-            "Use the person's name naturally. "
-            "Include relevant emojis. "
-            "Keep responses conversational but helpful."
-        )
+    else:  # Subsequent messages for logged-in users
+        reminder = f"Continue conversation with {user_name} naturally. Use their name, be engaging, and follow all previous rules."
         messages.append({"role": "system", "content": reminder})
     
     # Add conversation history (last 4 messages)
@@ -140,7 +143,7 @@ def chat():
     # Add current user message
     messages.append({"role": "user", "content": user_input})
     
-    # Prepare the payload for Gemini
+    # Prepare Gemini payload
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
     headers = {"Content-Type": "application/json"}
     data = {
@@ -152,18 +155,14 @@ def chat():
     try:
         response = requests.post(url, headers=headers, data=json.dumps(data))
         if response.status_code != 200:
-            print("Gemini Error:", response.text)
             return jsonify({"reply": "❌ Server is too busy at that moment"}), 500
-    
-        reply = response.json()['candidates'][0]['content']['parts'][0]['text']
         
-        # Clean up the response
+        reply = response.json()['candidates'][0]['content']['parts'][0]['text']
         reply = re.sub(r"^(SYSTEM|USER|ASSISTANT):\s*", "", reply, flags=re.IGNORECASE)
         
-        return jsonify({"reply": reply})
+        return jsonify({"reply": reply.strip()})
     
     except Exception as e:
-        print("Exception:", str(e))
         return jsonify({"reply": f"❌ Error: Check your internet connection"})
     
 @app.route('/update-theme', methods=['POST'])
