@@ -175,7 +175,11 @@ def get_preferred_name(full_name):
 def chat():
     user_input = request.json.get("message")
     history = request.json.get("history", [])
-    full_name = request.json.get("user_name", "Friend").strip()
+    user_data = request.json.get("user_data", {})
+    
+    # Get name - priority: 1) Google user full name 2) Provided name 3) Default "Friend"
+    full_name = user_data.get('full_name', request.json.get("user_name", "Friend")).strip()
+    is_google_user = user_data.get('is_google_user', False)
     
     # Get preferred name (first name or second name if first is prefix)
     preferred_name = get_preferred_name(full_name) if full_name != "Friend" else "Friend"
@@ -211,39 +215,44 @@ def chat():
     
     # Add conversation history
     for msg in history[-4:]:
-        messages.append(msg)
+        # Clean any instances where the AI might have called user "Brian"
+        cleaned_content = msg['content']
+        if msg['role'] == 'assistant':
+            cleaned_content = cleaned_content.replace("Brian,", f"{preferred_name},")
+            cleaned_content = cleaned_content.replace("Hey Brian", f"Hey {preferred_name}")
+            cleaned_content = cleaned_content.replace("Friend", preferred_name)
+        messages.append({"role": msg['role'], "content": cleaned_content})
     
+    # Add current user message
     messages.append({"role": "user", "content": user_input})
     
-    # Gemini API call
+    # Prepare Gemini request
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+    headers = {"Content-Type": "application/json"}
+    data = {
+        "contents": [{
+            "parts": [{"text": "\n".join([f"{m['role'].upper()}: {m['content']}" for m in messages])}]
+        }]
+    }
+    
     try:
-        response = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}",
-            headers={"Content-Type": "application/json"},
-            json={"contents": [{"parts": [{"text": "\n".join(
-                [f"{m['role'].upper()}: {m['content']}" for m in messages]
-            )}]}]}
-        )
-        
+        response = requests.post(url, headers=headers, data=json.dumps(data))
         reply = response.json()['candidates'][0]['content']['parts'][0]['text']
-        reply = re.sub(r"^(SYSTEM|USER|ASSISTANT):\s*", "", reply, flags=re.IGNORECASE)
         
-        # Post-processing for name usage
-        if not history:  # First message
+        # Post-processing to ensure correct name usage
+        reply = re.sub(r"^(SYSTEM|USER|ASSISTANT):\s*", "", reply, flags=re.IGNORECASE)
+        reply = reply.replace("Brian,", f"{preferred_name},")
+        reply = reply.replace("Hey Brian", f"Hey {preferred_name}")
+        reply = reply.replace("Friend", preferred_name)
+        
+        # Ensure first message uses full name
+        if not history:
             reply = reply.replace("Hello Friend!", f"Hello {full_name}!")
-        else:
-            # Replace any awkward name repetitions
-            reply = re.sub(r"Hey\s+\w+[,!]", "", reply)  # Remove "Hey Name"
-            # Ensure preferred name appears naturally
-            if preferred_name not in reply and full_name != "Friend":
-                # Insert name at natural point
-                sentences = reply.split('.')
-                if len(sentences) > 1:
-                    reply = f"{sentences[0]}, {preferred_name}.{'.'.join(sentences[1:])}"
         
         return jsonify({"reply": reply.strip()})
     
     except Exception as e:
+        print(f"Error: {str(e)}")
         return jsonify({"reply": "❌ Let me think differently about that..."})
     
 @app.route('/update-theme', methods=['POST'])

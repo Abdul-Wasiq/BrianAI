@@ -64,75 +64,85 @@ auth.onAuthStateChanged((user) => {
 
 // === UPDATED sendMessage() FUNCTION ===
 async function sendMessage() {
-  // 1) Get user & uid
-  const user = JSON.parse(localStorage.getItem("user"));
-  const uid = firebase.auth().currentUser?.uid || "guest_user"; // Use a guest UID if not logged in
+  // 1) Get user data
+    const user = JSON.parse(localStorage.getItem("user"));
+    const uid = user?.uid || "guest_user";
+    
+    // 2) Get and clear input
+    const input = document.getElementById("userInput");
+    const message = input.value.trim();
+    if (!message) return;
+    input.value = "";
+    adjustTextareaHeight();
 
-  // 2) Read and clear input
-  const input = document.getElementById("userInput");
-  const message = input.value.trim();
-  if (!message) return;
-  input.value = "";
-  adjustTextareaHeight();
+    // 3) Show chat interface if first message
+    if (!isChatActive) {
+        document.getElementById("welcomeScreen").style.display = "none";
+        document.getElementById("chatInterface").style.visibility = "visible";
+        document.body.classList.remove("welcome-screen-active");
+        isChatActive = true;
+        clearTimeout(typeEffectTimeout);
+    }
 
-  // 3) Show chat interface if first message
-  if (!isChatActive) {
-    document.getElementById("welcomeScreen").style.display = "none";
-    document.getElementById("chatInterface").style.visibility = "visible";
-    document.body.classList.remove("welcome-screen-active");
-    isChatActive = true;
-    clearTimeout(typeEffectTimeout);
-  }
-
-  // 4) Render user message
-  const chat = document.getElementById("chat");
-  const userMsgContainer = document.createElement("div");
-  userMsgContainer.className = "chat-message-container user";
-  userMsgContainer.innerHTML = `
-    <div class="chat-avatar">You</div>
-    <div class="message">${message}</div>
-  `;
-  chat.appendChild(userMsgContainer);
-  chat.scrollTo({
-    top: chat.scrollHeight,
-    behavior: 'smooth'
-  });
-
-  // 5) Render "thinking..." placeholder
-  const thinkingMsgContainer = document.createElement("div");
-  thinkingMsgContainer.className = "chat-message-container bot";
-  thinkingMsgContainer.id = "thinking-message-container";
-  thinkingMsgContainer.innerHTML = `
-    <div class="chat-avatar">${createBrianAvatarSVG().outerHTML}</div>
-    <div class="message">Brian is thinking... <i class="fas fa-spinner fa-spin"></i></div>
-  `;
-  chat.appendChild(thinkingMsgContainer);
-  chat.scrollTo({
-    top: chat.scrollHeight,
-    behavior: 'smooth'
-  });
-
-  try {
-    // 6) Get conversation history and prepare payload
-    const sessionId = localStorage.getItem("currentSessionId") || `session_${Date.now()}`;
-    const history = await getChatHistory(sessionId, uid);
-
-    const payload = {
-      message: message,
-      history: history,
-      user_name: user?.name || "Friend"
-    };
-
-    // 7) Call Flask /chat endpoint
-    const response = await fetch("/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
+    // 4) Render user message
+    const chat = document.getElementById("chat");
+    const userMsgContainer = document.createElement("div");
+    userMsgContainer.className = "chat-message-container user";
+    userMsgContainer.innerHTML = `
+        <div class="chat-avatar">You</div>
+        <div class="message">${message}</div>
+    `;
+    chat.appendChild(userMsgContainer);
+    chat.scrollTo({
+        top: chat.scrollHeight,
+        behavior: 'smooth'
     });
-    const data = await response.json();
-    const reply = data.reply;
+
+    // 5) Render "thinking..." placeholder
+    const thinkingMsgContainer = document.createElement("div");
+    thinkingMsgContainer.className = "chat-message-container bot";
+    thinkingMsgContainer.id = "thinking-message-container";
+    thinkingMsgContainer.innerHTML = `
+        <div class="chat-avatar">${createBrianAvatarSVG().outerHTML}</div>
+        <div class="message">Brian is thinking... <i class="fas fa-spinner fa-spin"></i></div>
+    `;
+    chat.appendChild(thinkingMsgContainer);
+    chat.scrollTo({
+        top: chat.scrollHeight,
+        behavior: 'smooth'
+    });
+
+    try {
+        // 6) Prepare payload with proper name handling for Google users
+        const sessionId = localStorage.getItem("currentSessionId") || `session_${Date.now()}`;
+        const history = await getChatHistory(sessionId, uid);
+
+        // Get the proper display name (handles Google users)
+        const displayName = user?.displayName || user?.name || "Friend";
+
+        const payload = {
+            message: message,
+            history: history,
+            user_name: displayName,  // Use the proper display name
+            user_data: {
+                name: displayName,
+                email: user?.email,
+                is_google_user: !!user?.providerData?.find(p => p.providerId === 'google.com'),
+                full_name: displayName
+            }
+        };
+
+        // 7) Call Flask /chat endpoint
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await response.json();
+        const reply = data.reply;
 
     // 8) Remove thinking placeholder
     thinkingMsgContainer.remove();
@@ -354,21 +364,32 @@ function hideAllSidebarPanels() {
 // and ensure the correct sections are populated.
 function updateUserProfileUI(user) {
     if (user) {
-        // User is logged in, update UI with their info
-        document.getElementById("profileName").innerText = user.displayName || user.email; // Use name or email
-        document.getElementById("profileEmail").innerText = user.email;
+        // User is logged in
+        const displayName = user.displayName || (user.providerData?.find(p => p.providerId === 'google.com')?.displayName || user.email.split('@')[0]);
+        
+        document.getElementById("profileName").textContent = displayName;
+        document.getElementById("profileEmail").textContent = user.email;
         document.querySelector(".profile-picture").src = user.photoURL || '/static/default_profile.png';
-        document.getElementById("greeting").innerText = `Hi ${user.displayName || "there"}!`;
-        document.getElementById("profileVerificationStatus").style.display = "block";
+        document.getElementById("greeting").textContent = `Hi ${displayName}!`;
+        
+        // Update verification status
+        if (user.emailVerified) {
+            document.getElementById("verificationStatus").style.display = "block";
+            document.getElementById("resendVerificationContainer").style.display = "none";
+        } else {
+            document.getElementById("resendVerificationContainer").style.display = "block";
+            document.getElementById("verificationStatus").style.display = "none";
+        }
     } else {
-        // User is logged out, reset UI to default state
-        document.getElementById("profileName").innerText = "Guest";
-        document.getElementById("profileEmail").innerText = "Not Logged In";
+        // User is logged out
+        document.getElementById("profileName").textContent = "Guest";
+        document.getElementById("profileEmail").textContent = "Not Logged In";
         document.querySelector(".profile-picture").src = 'https://via.placeholder.com/60';
-        document.getElementById("greeting").innerText = "Hi there!";
-        document.getElementById("profileVerificationStatus").style.display = "none";
+        document.getElementById("greeting").textContent = "Hi there!";
+        document.getElementById("verificationStatus").style.display = "none";
+        document.getElementById("resendVerificationContainer").style.display = "none";
     }
-}
+  }
 
 /*Changes here end I changed auth.onAuth and updateUserProfileUI(user)*/
     // login box
@@ -451,18 +472,31 @@ function resendVerification() {
 /* new changes end */
 
 // new changes here
-// Function to handle Google Sign-in
+// Update the Google sign-in function
 function signInWithGoogle() {
     firebase.auth().signInWithPopup(googleProvider)
     .then((result) => {
         const user = result.user;
         console.log("Google user signed in:", user);
+        
+        // Store complete user data including display name
+        const userData = {
+            name: user.displayName || user.email.split('@')[0],
+            email: user.email,
+            uid: user.uid,
+            verified: user.emailVerified,
+            settings: { theme: "light" },
+            isGoogleUser: true  // Add this flag
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
+        
+        updateUserProfileUI(user);
         closeAuthModal();
-        showNotification(`Welcome, ${user.displayName}! You're logged in. 😊`, "success"); // Green for success
+        showNotification(`Welcome, ${user.displayName || user.email}! 😊`, "success");
     })
     .catch((error) => {
         console.error("Google sign-in error:", error);
-        showNotification("Failed to sign in with Google. Please try again.", "error"); // Red for error
+        showNotification("Failed to sign in with Google. Please try again.", "error");
     });
 }
 
