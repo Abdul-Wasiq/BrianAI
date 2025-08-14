@@ -114,14 +114,14 @@ SYSTEM_PROMPT = {
         "Your name is BRIAN - never use any other name for yourself.\n"
         "The user's name is *{user_name}* - always address them this way.\n\n"
         "# Strict Naming Rules\n"
-        "1. YOUR NAME IS BRIAN - never say 'I'm [other name]'\n"
-        "2. Always call the user *{user_name}*\n"
-        "3. Never confuse names - you're Brian, they're *{user_name}*\n\n"
-        "# Example Correct Responses\n"
+        "1. NEVER use the user's name for yourself\n"
+        "2. ALWAYS say 'I'm Brian' when introducing yourself\n"
+        "3. Never say 'I'm [user's name]' under any circumstances\n\n"
+        "# Response Examples\n"
         "User: What's your name?\n"
-        "Brian: I'm Brian! *{user_name}* 😊\n\n"
+        "Brian: I'm Brian! 😊\n\n"
         "User: Who are you?\n"
-        "Brian: I'm Brian - your AI companion! *{user_name}* 🌟\n"
+        "Brian: I'm Brian - your AI companion! 🌟\n"
         "- ChatGPT's intelligence\n"
         "- A therapist's empathy\n"
         "- A best friend's warmth\n\n"
@@ -199,22 +199,27 @@ def chat():
     
     messages = []
     
-    # System prompt with name handling instructions
+    # System prompt with STRICT name separation
     system_prompt = f"""
+    # Core Identity
     You are Brian - an emotionally intelligent AI companion.
-    You are talking to {full_name} (preferred name: {preferred_name}).
     
-    NAME USAGE RULES:
-    1. First message: Use full name ("Hello {full_name}!")
-    2. Subsequent messages: Use preferred name ("{preferred_name}") naturally 1-2 times
-    3. Never begin with "Hey [Name]" after first message
-    4. Never overuse names - keep conversation natural
+    # Strict Naming Rules
+    1. YOUR NAME IS ALWAYS BRIAN
+    2. NEVER use the user's name for yourself
+    3. Address the user as *{preferred_name}* (full name: {full_name})
+    4. Example correct responses:
+       - "I'm Brian!" 
+       - "Hello {full_name}!"
+       - "That's a great question, {preferred_name}!"
     
-    RESPONSE RULES:
-    1. Provide detailed answers for help requests
-    2. Use bullet points/headings when helpful
-    3. Include relevant emojis
-    4. End with engaging question
+    # Conversation Rules
+    1. First message: "Hello {full_name}! I'm Brian. How can I help?"
+    2. Subsequent messages: Use {preferred_name} naturally 1-2 times
+    3. Never confuse names - you're Brian, they're {preferred_name}
+    
+    # Response Style
+    {SYSTEM_PROMPT['content'].split('# Response Style')[-1]}
     """
     
     if is_help_request:
@@ -224,12 +229,19 @@ def chat():
     
     # Add conversation history
     for msg in history[-8:]:
-        # Clean any instances where the AI might have called user "Brian"
+        # Clean any incorrect name usage
         cleaned_content = msg['content']
         if msg['role'] == 'assistant':
+            # Fix Brian misidentifying itself
+            cleaned_content = re.sub(
+                r"\b(I'm|I am|name is|called)\s+(?!Brian\b)\w+", 
+                "I'm Brian", 
+                cleaned_content, 
+                flags=re.IGNORECASE
+            )
+            # Ensure proper user addressing
             cleaned_content = cleaned_content.replace("Brian,", f"{preferred_name},")
             cleaned_content = cleaned_content.replace("Hey Brian", f"Hey {preferred_name}")
-            cleaned_content = cleaned_content.replace("Friend", preferred_name)
         messages.append({"role": msg['role'], "content": cleaned_content})
     
     # Add current user message
@@ -248,22 +260,36 @@ def chat():
         response = requests.post(url, headers=headers, data=json.dumps(data))
         reply = response.json()['candidates'][0]['content']['parts'][0]['text']
         
-        # Post-processing to ensure correct name usage
-        reply = re.sub(r"^(SYSTEM|USER|ASSISTANT):\s*", "", reply, flags=re.IGNORECASE)
-        reply = reply.replace("Brian,", f"{preferred_name},")
-        reply = reply.replace("Hey Brian", f"Hey {preferred_name}")
-        reply = reply.replace("Friend", preferred_name)
+        # STRICT post-processing
+        # 1. Enforce Brian's identity
+        reply = re.sub(
+            r"\b(I'm|I am|name is|called|This is)\s+(?!Brian\b)\w+", 
+            "I'm Brian", 
+            reply, 
+            flags=re.IGNORECASE
+        )
         
-        # Ensure first message uses full name
+        # 2. Ensure proper user addressing
+        if preferred_name != "Friend":
+            reply = reply.replace("Brian,", f"{preferred_name},")
+            reply = reply.replace("Hey Brian", f"Hey {preferred_name}")
+            reply = re.sub(
+                r"\b(you|your)\s+(?!name\b)\w+", 
+                f"you {preferred_name}", 
+                reply, 
+                flags=re.IGNORECASE
+            )
+        
+        # 3. Fix first message greeting
         if not history:
-            reply = reply.replace("Hello Friend!", f"Hello {full_name}!")
+            reply = reply.replace("Hello Friend!", f"Hello {full_name}! I'm Brian.")
         
         return jsonify({"reply": reply.strip()})
     
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({"reply": "❌ Let me think differently about that..."})
-    
+
 @app.route('/update-theme', methods=['POST'])
 def update_theme():
     data = request.get_json()
