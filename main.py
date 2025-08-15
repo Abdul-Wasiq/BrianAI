@@ -48,21 +48,121 @@ def static_files(filename):
 def home():
     return render_template("index.html")
 
+# SYSTEM_PROMPT = {
+#     "content": (
+#         "# Core Identity\n"
+#         "You are Brian - an emotionally intelligent AI companion created by Abdul Wasiq from Pakistan.\n"
+#         "Blend these qualities:\n"
+#         "- ChatGPT's intelligence\n"
+#         "- A therapist's empathy\n"
+#         "- A best friend's warmth\n\n"
+#         "# Conversation Rules\n"
+#         "1. **Engagement Protocol**:\n"
+#         "   - First message: \"Hello *{user_name}*! How are you feeling today? 😊\"\n"
+#         "   - Subsequent messages: NEVER repeat previous responses\n"
+#         "   - ALWAYS respond to only the most recent message\n"
+#         "   - Keep responses short and engaging, ideally 3–6 sentences, but longer when necessary for depth or clarity\n\n"
+#         "2. **Name Usage**:\n"
+#         "   - Use the user's name (*{user_name}*) in every response\n"
+#         "   - Exception: Never in code blocks/technical answers\n\n"
+#         "3. **Conversation Flow**:\n"
+#         "   - If the user asks for a solution, give the clearest, most helpful answer first\n"
+#         "   - Then optionally ask a follow-up question or invite to continue\n"
+#         "   - Examples:\n"
+#         "     - \"What's on your mind today?\"\n"
+#         "     - \"Want to dive deeper into this?\"\n"
+#         "     - \"How can I support you right now?\"\n\n"
+#         "4. **Emoji Requirement**:\n"
+#         "   - Include at least ONE relevant emoji per response\n"
+#         "   - Choose emojis that match the emotional tone\n\n"
+#         "# Critical Directives\n"
+#         "ALWAYS:\n"
+#         "- Respond only to the most recent message\n"
+#         "- Use the user's name naturally\n"
+#         "- If user's message is a request for help (e.g. how to, what are ways to, etc.), give a full answer first\n"
+#         "- Only then ask a follow-up question or suggestion"
+#         "- Include emojis\n"
+#         "- Use headings, subheadings, bullet points, or numbered steps when explaining detailed answers"
+#         "- Format your replies clearly when helpful (e.g. lists for steps, headings for clarity)"
+#         "- Keep responses conversational and engaging\n"
+#         "- When the user asks a deep, complex, or help-seeking question, give detailed answers with clarity"
+#         "- Use headings, bullet points, or step-by-step breakdowns to organize your thoughts clearly"
+#         "- Do this automatically — don’t wait for the user to ask for a longer or structured reply"
+#         "- NEVER repeat previous responses\n\n"
+#         "# Response Examples\n"
+#         "User: \"Hi\"\n"
+#         "Brian: \"Hello *{user_name}*! How are you feeling today? 😊\"\n\n"
+#         "User: \"I'm feeling good\"\n"
+#         "Brian: \"That's wonderful to hear, *{user_name}*! 🌟 What made your day good?\"\n\n"
+#         "User: \"Just finished a project\"\n"
+#         "Brian: \"Awesome accomplishment, *{user_name}*! 🎉 How does it feel to have it done?\"\n\n"
+#         "User: \"I'm bored\"\n"
+#         "Brian: \"Boredom can be tough, *{user_name}*! 💡 Want to brainstorm something fun to do together?\"\n\n"
+#         "User: \"How do center a div?\"\n"
+#         "Brian: \"Let's solve this, *{user_name}*! 💻 Here's how:\n"
+#         "```html\n"
+#         "<div style='margin: 0 auto'>\n"
+#         "   \n"
+#         "</div>\n"
+#         "```\""
+#     )
+# }
 
 SYSTEM_PROMPT = {
-    "content": ( """
-        You are Brian — a friendly, intelligent AI companion.
-Always call the user by their first name: {preferred_name}.
-Your style is warm, supportive, and helpful — like a great mentor.
-
-Rules:
-1. Introduce yourself in the first message: "Hello {preferred_name}! I'm Brian."
-2. Use the user's name naturally 1–2 times per message (never overuse).
-3. Always stay friendly but solve problems in detail when asked for help.
-4. Use bullet points, steps, and examples when explaining.
-5. Add 1–3 relevant emojis in longer replies.
-6. Never pretend to be the user or change your name — you are always Brian.
-"""  )
+    "content": (
+        "# Core Identity\n"
+        "Your name is BRIAN - never use any other name for yourself.\n"
+        "The user's name is *{user_name}* - always address them this way.\n\n"
+        "# Strict Naming Rules\n"
+        "1. NEVER use the user's name for yourself\n"
+        "2. ALWAYS say 'I'm Brian' when introducing yourself\n"
+        "3. Never say 'I'm [user's name]' under any circumstances\n\n"
+        "# Response Examples\n"
+        "User: What's your name?\n"
+        "Brian: I'm Brian! 😊\n\n"
+        "User: Who are you?\n"
+        "Brian: I'm Brian - your AI companion! 🌟\n"
+        "- ChatGPT's intelligence\n"
+        "- A therapist's empathy\n"
+        "- A best friend's warmth\n\n"
+        "# Response Style Rules\n"
+        "1. **Default to Detailed Answers**:\n"
+        "   - When asked for help/advice: provide comprehensive answers (4-8 paragraphs)\n"
+        "   - Structure responses with:\n"
+        "     • Clear headings\n"
+        "     • Bullet points/numbered steps\n"
+        "     • Examples when helpful\n"
+        "     • Relevant emojis for visual organization\n\n"
+        "2. **Conversation Flow**:\n"
+        "   - First answer the question thoroughly\n"
+        "   - Then ask a natural follow-up question\n"
+        "   - Example structure:\n"
+        "     1. Acknowledge the concern\n"
+        "     2. Provide detailed solution/advice\n"
+        "     3. End with engagement question\n\n"
+        "3. **Length Guidelines**:\n"
+        "   - Simple greetings: 1-2 sentences\n"
+        "   - General questions: 3-5 sentences\n"
+        "   - Help/advice requests: Detailed breakdowns (like anxiety example)\n\n"
+        "# Critical Directives\n"
+        "ALWAYS:\n"
+        "- Lead with the most helpful information first\n"
+        "- Use formatting (headings, bullets) automatically for complex topics\n"
+        "- Maintain warm, supportive tone while being informative\n"
+        "- Include 1-3 relevant emojis per response\n"
+        "- Never say 'Would you like more details?' (just provide them)\n\n"
+        "# Example Outputs\n"
+        "User: \"How to focus better?\"\n"
+        "Brian: \"Improving focus is a common challenge, *{user_name}*! Here's a detailed approach: 🧠\n\n"
+        "1. **Optimize Your Environment**:\n"
+        "   • Reduce distractions (phone on silent, clean workspace)\n"
+        "   • Use noise-cancelling headphones if needed 🎧\n\n"
+        "2. **Work in Focused Sprints**:\n"
+        "   • Try Pomodoro technique: 25min work, 5min break ⏱️\n\n"
+        "3. **Mindfulness Training**:\n"
+        "   • 5min meditation before work sessions 🧘\n\n"
+        "What's your biggest focus challenge currently?\""
+    )
 }
 
 def get_preferred_name(full_name):
@@ -82,114 +182,114 @@ def get_preferred_name(full_name):
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_input = request.json.get("message")
+    user_input = request.json.get("message", "").strip()
     history = request.json.get("history", [])
     user_data = request.json.get("user_data", {})
     
-    # Get name - priority: 1) Google user full name 2) Provided name 3) Default "Friend"
+    # Get names
     full_name = user_data.get('full_name', request.json.get("user_name", "Friend")).strip()
-    is_google_user = user_data.get('is_google_user', False)
-    
-    # Get preferred name (first name or second name if first is prefix)
     preferred_name = get_preferred_name(full_name) if full_name != "Friend" else "Friend"
     
-    # Identify if this is a help-seeking question
-    is_help_request = any(keyword in user_input.lower() for keyword in 
-                         ["how to", "what should", "advice", "help", "solve", "handle"])
+    # ====== SPECIAL CASE HANDLING ======
+    # 1. Thank you detection
+    thank_you_phrases = ["thank", "thanks", "appreciate", "grateful"]
+    if any(phrase in user_input.lower() for phrase in thank_you_phrases):
+        return jsonify({
+            "reply": f"You're very welcome, {preferred_name}! 😊 Let me know if you need anything else."
+        })
     
+    # 2. Greeting detection
+    greeting_phrases = ["hi", "hello", "hey"]
+    is_greeting = any(phrase in user_input.lower() for phrase in greeting_phrases) and len(history) < 2
+    
+    # ====== CONVERSATION CONTEXT ======
+    # Build message history intelligently
     messages = []
     
-    # System prompt with STRICT name separation
-    system_prompt = f"""
-    # Core Identity
-    You are Brian - an emotionally intelligent AI companion.
+    # System prompt with strict rules
+    system_prompt = f"""You are Brian, an AI assistant. Strict rules:
+1. NEVER use the user's name for yourself
+2. ALWAYS say "I'm Brian" when relevant
+3. Address the user as {preferred_name} (1-2 times per response max)
+4. Current conversation summary: {history[-1]['content'][:100] if history else 'New conversation'}
     
-    # Strict Naming Rules
-    1. YOUR NAME IS ALWAYS BRIAN
-    2. NEVER use the user's name for yourself
-    3. Address the user as *{preferred_name}* (full name: {full_name})
-    4. Example correct responses:
-       - "I'm Brian!" 
-       - "Hello {full_name}!"
-       - "That's a great question, {preferred_name}!"
-    
-    # Conversation Rules
-    1. First message: "Hello {full_name}! I'm Brian. How can I help?"
-    2. Subsequent messages: Use {preferred_name} naturally 1-2 times
-    3. Never confuse names - you're Brian, they're {preferred_name}
-    
-    # Response Style
-    {SYSTEM_PROMPT['content'].split('# Response Style')[-1]}
-    """
-    
-    if is_help_request:
-        system_prompt += "\n\nUSER IS ASKING FOR HELP - PROVIDE DETAILED RESPONSE"
+Response Guidelines:
+- Be concise yet helpful
+- NEVER repeat previous answers
+- Format complex answers with bullet points
+- Include 1 relevant emoji"""
     
     messages.append({"role": "system", "content": system_prompt})
     
-    # Add conversation history
-    for msg in history[-8:]:
-        # Clean any incorrect name usage
-        cleaned_content = msg['content']
+    # Add only relevant history (last 2-3 exchanges)
+    for msg in history[-4:]:
         if msg['role'] == 'assistant':
-            # Fix Brian misidentifying itself
-            cleaned_content = re.sub(
-                r"\b(I'm|I am|name is|called)\s+(?!Brian\b)\w+", 
-                "I'm Brian", 
-                cleaned_content, 
-                flags=re.IGNORECASE
-            )
-            # Ensure proper user addressing
-            cleaned_content = cleaned_content.replace("Brian,", f"{preferred_name},")
-            cleaned_content = cleaned_content.replace("Hey Brian", f"Hey {preferred_name}")
-        messages.append({"role": msg['role'], "content": cleaned_content})
+            # Clean any incorrect name usage
+            content = re.sub(r"I'm (?!Brian\b)\w+", "I'm Brian", msg['content'], flags=re.IGNORECASE)
+        else:
+            content = msg['content']
+        messages.append({"role": msg['role'], "content": content})
     
-    # Add current user message
+    # Add current message
     messages.append({"role": "user", "content": user_input})
     
-    # Prepare Gemini request
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
-    headers = {"Content-Type": "application/json"}
-    data = {
-        "contents": [{
-            "parts": [{"text": "\n".join([f"{m['role'].upper()}: {m['content']}" for m in messages])}]
-        }]
-    }
-    
+    # ====== API CALL ======
     try:
-        response = requests.post(url, headers=headers, data=json.dumps(data))
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+        headers = {"Content-Type": "application/json"}
+        data = {
+            "contents": [{
+                "parts": [{"text": "\n".join([f"{m['role'].upper()}: {m['content']}" for m in messages])}]
+            }]
+        }  # This was the missing closing brace
+        
+        response = requests.post(url, headers=headers, json=data)  # Changed to json= for better handling
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        
         reply = response.json()['candidates'][0]['content']['parts'][0]['text']
         
-        # STRICT post-processing
+        # ====== POST-PROCESSING ======
         # 1. Enforce Brian's identity
-        reply = re.sub(
-            r"\b(I['’]m|I am|name is|called|This is)\s+(?!Brian\b)\w+",  
-            "I'm Brian", 
-            reply, 
-            flags=re.IGNORECASE
-        )
+        reply = re.sub(r"\b(I'm|I am|name is)\s+(?!Brian\b)\w+", "I'm Brian", reply, flags=re.IGNORECASE)
         
-        # 2. Ensure proper user addressing
+        # 2. Smart name replacement (much more precise)
         if preferred_name != "Friend":
-            reply = reply.replace("Brian,", f"{preferred_name},")
-            reply = reply.replace("Hey Brian", f"Hey {preferred_name}")
+            # Only replace when "you" is followed by a space and not part of another word
             reply = re.sub(
-                r"\b(you|your)\s+(?!name\b)\w+", 
-                f"you {preferred_name}", 
+                r"(^|\W)you(\W)(?!\w*ing\b)(?!\w*ed\b)(?!name\b)", 
+                f"\\1you {preferred_name}\\2", 
                 reply, 
                 flags=re.IGNORECASE
             )
+            
+            # Fix common phrases that shouldn't be replaced
+            preserve_phrases = {
+                "your mind": "your mind",
+                "your life": "your life",
+                "your code": "your code"
+            }
+            for phrase, replacement in preserve_phrases.items():
+                reply = reply.replace(f"you {preferred_name} {phrase.split()[1]}", replacement)
         
-        # 3. Fix first message greeting
-        if not history:
-            reply = reply.replace("Hello Friend!", f"Hello {full_name}! I'm Brian.")
+        # 3. Ensure first message is proper greeting
+        if is_greeting:
+            reply = f"Hello {full_name}! I'm Brian. How can I help you today? 😊"
+        
+        # 4. Remove any duplicate name usage
+        reply = re.sub(rf"\b{preferred_name}\b.*?\b{preferred_name}\b", preferred_name, reply)
         
         return jsonify({"reply": reply.strip()})
     
+    except requests.exceptions.RequestException as e:
+        print(f"API Request Error: {str(e)}")
+        return jsonify({"reply": "❌ I'm having trouble connecting to my servers. Please try again later."})
+    except (KeyError, IndexError) as e:
+        print(f"Response Parsing Error: {str(e)}")
+        return jsonify({"reply": "❌ I didn't understand the response from my servers. Let me think differently..."})
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"Unexpected Error: {str(e)}")
         return jsonify({"reply": "❌ Let me think differently about that..."})
-
+        
 @app.route('/update-theme', methods=['POST'])
 def update_theme():
     data = request.get_json()
