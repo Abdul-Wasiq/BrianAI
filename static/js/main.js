@@ -1650,3 +1650,56 @@ async function startNewChat() {
   // 4) Focus input (now visible since sidebars are closed)
   document.getElementById("userInput").focus();
 }
+
+
+// Add click handlers to all action buttons
+document.querySelectorAll('.input-action-button').forEach(button => {
+  button.addEventListener('click', function(e) {
+    e.preventDefault(); // Prevent default behavior
+    
+    // Get the icon inside the button
+    const icon = this.querySelector('i');
+    const originalIcon = icon.className;
+    
+    // 1. Show loading state
+    icon.className = 'fas fa-spinner fa-spin'; // Spinner icon
+    
+    // 2. Remove tooltip during loading
+    const tooltip = this.querySelector('.tooltip');
+    const originalDisplay = tooltip.style.display;
+    tooltip.style.display = 'none';
+    
+    // Random delay between 1-2 seconds
+    const delay = 1000 + Math.random() * 1000;
+    
+    setTimeout(() => {
+      // 3. Restore original icon
+      icon.className = originalIcon;
+      
+      // 4. Show red notification
+      const notification = document.createElement('div');
+      notification.className = 'feature-notification';
+      
+      // Set different messages based on which button
+      if (this.querySelector('.fa-video')) {
+        notification.textContent = 'Privacy first. Unlocking soon.';
+      } else if (this.querySelector('.fa-desktop')) {
+        notification.textContent = 'Deployment done — open terminal to enter prompt.';
+      } else {
+        notification.textContent = 'Voice input currently unavailable';
+      }
+      
+      // Add to DOM
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 3 seconds
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+      
+      // Restore tooltip
+      tooltip.style.display = originalDisplay;
+      
+    }, delay);
+  });
+});

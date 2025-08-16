@@ -1,4 +1,3 @@
-# main.py
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
@@ -9,18 +8,21 @@ import hashlib
 from flask import send_from_directory
 import smtplib
 from email.mime.text import MIMEText
-import time # Add this import for timestamp
+import time  # Import is correct but unused - consider removing if not needed
 
 app = Flask(__name__)
 CORS(app)
-API_KEY = "AIzaSyDu8l2F6k_904gaxg0YYGVRQzm9pjoemyI"
+
+# Security Note: API keys should not be hardcoded. Use environment variables.
+API_KEY = "AIzaSyDu8l2F6k_904gaxg0YYGVRQzm9pjoemyI"  # Consider moving to environment variable
 
 app.static_folder = 'static'
 app.template_folder = 'templates'
 
 # --- Email Configuration ---
-EMAIL_ADDRESS = 'abdulwasiq651@gmail.com'
-EMAIL_PASSWORD = 'naib gwdw snnf dlmp'
+# Security Warning: Never hardcode email credentials. Use environment variables or secure config.
+EMAIL_ADDRESS = 'abdulwasiq651@gmail.com'  # Move to environment variable
+EMAIL_PASSWORD = 'naib gwdw snnf dlmp'     # Move to environment variable
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
@@ -48,6 +50,7 @@ def static_files(filename):
 def home():
     return render_template("index.html")
 
+# SYSTEM_PROMPT is defined but never used in the code - consider removing if not needed
 SYSTEM_PROMPT = {
     "content": (
         "# Core Identity\n"
@@ -98,11 +101,11 @@ def get_preferred_name(full_name):
     """Extracts the preferred name (first name) from full name"""
     # Common prefixes to ignore
     prefixes = {'muhammad', 'md', 'mohd', 'muhammed', 'mohammad'}
-    
+   
     names = full_name.strip().split()
     if not names:
         return "Friend"
-    
+   
     # Check if first name is a prefix
     first_name = names[0].lower()
     if first_name in prefixes and len(names) > 1:
@@ -111,114 +114,44 @@ def get_preferred_name(full_name):
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_input = request.json.get("message", "").strip()
-    history = request.json.get("history", [])
-    user_data = request.json.get("user_data", {})
-    
-    # Get names
-    full_name = user_data.get('full_name', request.json.get("user_name", "Friend")).strip()
-    preferred_name = get_preferred_name(full_name) if full_name != "Friend" else "Friend"
-    
-    # ====== SPECIAL CASE HANDLING ======
-    # 1. Thank you detection
-    thank_you_phrases = ["thank", "thanks", "appreciate", "grateful"]
-    if any(phrase in user_input.lower() for phrase in thank_you_phrases):
-        return jsonify({
-            "reply": f"You're very welcome, {preferred_name}! 😊 Let me know if you need anything else."
-        })
-    
-    # 2. Greeting detection
-    greeting_phrases = ["hi", "hello", "hey"]
-    is_greeting = any(phrase in user_input.lower() for phrase in greeting_phrases) and len(history) < 2
-    
-    # ====== CONVERSATION CONTEXT ======
-    # Build message history intelligently
-    messages = []
-    
-    # System prompt with strict rules
-    system_prompt = f"""You are Brian, an AI assistant. Strict rules:
-1. NEVER use the user's name for yourself
-2. ALWAYS say "I'm Brian" when relevant
-3. Address the user as {preferred_name} (1-2 times per response max)
-4. Current conversation summary: {history[-1]['content'][:100] if history else 'New conversation'}
-    
-Response Guidelines:
-- Be concise yet helpful
-- NEVER repeat previous answers
-- Format complex answers with bullet points
-- Include 1 relevant emoji"""
-    
-    messages.append({"role": "system", "content": system_prompt})
-    
-    # Add only relevant history (last 2-3 exchanges)
-    for msg in history[-4:]:
-        if msg['role'] == 'assistant':
-            # Clean any incorrect name usage
-            content = re.sub(r"I'm (?!Brian\b)\w+", "I'm Brian", msg['content'], flags=re.IGNORECASE)
-        else:
-            content = msg['content']
-        messages.append({"role": msg['role'], "content": content})
-    
-    # Add current message
-    messages.append({"role": "user", "content": user_input})
-    
-    # ====== API CALL ======
     try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
-        headers = {"Content-Type": "application/json"}
-        data = {
-            "contents": [{
-                "parts": [{"text": "\n".join([f"{m['role'].upper()}: {m['content']}" for m in messages])}]
-            }]
-        }  # This was the missing closing brace
+        user_input = request.json.get("message", "").strip()
+        name = request.json.get("user_name", "Friend")
         
-        response = requests.post(url, headers=headers, json=data)  # Changed to json= for better handling
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        # PROMPT ENGINEERING - Critical for good responses
+        system_prompt = f"""You are Brian, a helpful AI assistant created by Abdul Wasiq. 
+        - Always respond as Brian
+        - Address the user as {name} (once per response)
+        - Be concise but helpful
+        - For medical questions, add disclaimer
+        - For code, use markdown blocks"""
         
-        reply = response.json()['candidates'][0]['content']['parts'][0]['text']
+        # Build the proper Gemini API request
+        response = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}",
+            json={
+                "contents": [{
+                    "parts": [
+                        {"text": system_prompt},
+                        {"text": f"User: {user_input}"},
+                        {"text": "Respond as Brian:"}
+                    ]
+                }]
+            },
+            timeout=10  # Important for hackathon!
+        )
         
-        # ====== POST-PROCESSING ======
-        # 1. Enforce Brian's identity
-        reply = re.sub(r"\b(I'm|I am|name is)\s+(?!Brian\b)\w+", "I'm Brian", reply, flags=re.IGNORECASE)
-        
-        # 2. Smart name replacement (much more precise)
-        if preferred_name != "Friend":
-            # Only replace when "you" is followed by a space and not part of another word
-            reply = re.sub(
-                r"(^|\W)you(\W)(?!\w*ing\b)(?!\w*ed\b)(?!name\b)", 
-                f"\\1you {preferred_name}\\2", 
-                reply, 
-                flags=re.IGNORECASE
-            )
+        # Proper response parsing
+        if response.status_code == 200:
+            reply = response.json()['candidates'][0]['content']['parts'][0]['text']
+            return jsonify({"reply": reply})
+        else:
+            return jsonify({"reply": f"🚀 {name}, I'm upgrading my knowledge! Try again in a moment."})
             
-            # Fix common phrases that shouldn't be replaced
-            preserve_phrases = {
-                "your mind": "your mind",
-                "your life": "your life",
-                "your code": "your code"
-            }
-            for phrase, replacement in preserve_phrases.items():
-                reply = reply.replace(f"you {preferred_name} {phrase.split()[1]}", replacement)
-        
-        # 3. Ensure first message is proper greeting
-        if is_greeting:
-            reply = f"Hello {full_name}! I'm Brian. How can I help you today? 😊"
-        
-        # 4. Remove any duplicate name usage
-        reply = re.sub(rf"\b{preferred_name}\b.*?\b{preferred_name}\b", preferred_name, reply)
-        
-        return jsonify({"reply": reply.strip()})
-    
-    except requests.exceptions.RequestException as e:
-        print(f"API Request Error: {str(e)}")
-        return jsonify({"reply": "❌ I'm having trouble connecting to my servers. Please try again later."})
-    except (KeyError, IndexError) as e:
-        print(f"Response Parsing Error: {str(e)}")
-        return jsonify({"reply": "❌ I didn't understand the response from my servers. Let me think differently..."})
     except Exception as e:
-        print(f"Unexpected Error: {str(e)}")
-        return jsonify({"reply": "❌ Let me think differently about that..."})
-        
+        print(f"Error: {str(e)}")  # Debugging
+        return jsonify({"reply": f"💡 {name}, let me think differently about that..."})
+    
 @app.route('/update-theme', methods=['POST'])
 def update_theme():
     data = request.get_json()
@@ -247,7 +180,6 @@ def update_theme():
 
     return jsonify({'message': 'Theme updated successfully'})
 
-# A new route for sending email verification
 @app.route('/send-verification-email', methods=['POST'])
 def send_verification_email_route():
     data = request.get_json()
@@ -299,4 +231,4 @@ def verify_email():
     """
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)  # Added debug=True for development
