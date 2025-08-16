@@ -1,3 +1,4 @@
+
 # # main.py
 # from flask import Flask, request, jsonify, render_template
 # from flask_cors import CORS
@@ -89,6 +90,7 @@
 #     history = request.json.get("history", [])
 #     user_data = request.json.get("user_data", {})
     
+#     # We'll use the user_data to make the first name accessible to the AI.
 #     full_name = user_data.get('full_name', request.json.get("user_name", "Friend")).strip()
 #     preferred_name = get_preferred_name(full_name) if full_name != "Friend" else "Friend"
     
@@ -100,23 +102,27 @@
     
 #     messages = []
     
-#     # CRITICAL FIX: The API expects `parts` with a `text` field, and the roles
-#     # must alternate correctly in the `contents` array. We will add the
-#     # system prompt as a user message at the beginning of the conversation.
-    
-#     # Add the initial system prompt as a user message.
-#     # This must be the first message in the `messages` array.
+#     # The API expects roles and a structured 'parts' format.
+#     # The system prompt is added to the beginning of the conversation.
 #     if not history:
+#         # For the first message, we add a special persona-setting message.
 #         messages.append({"role": "user", "parts": [{"text": SYSTEM_PROMPT['content']}]})
-#         messages.append({"role": "model", "parts": [{"text": f"Hey there, {full_name}! I'm Brian. How can I help you with that today? 😊"}]})
+        
+#         # We also create a special initial reply based on the user's name.
+#         # This gives a better first impression than a generic greeting.
+#         initial_reply = f"Hey there, {preferred_name}! I'm Brian. How can I help you with that today? 😊"
+#         messages.append({"role": "model", "parts": [{"text": initial_reply}]})
+        
+#         # Now we add the user's *actual* first message.
+#         messages.append({"role": "user", "parts": [{"text": user_input}]})
 #     else:
-#         # Reconstruct the conversation history with correct roles and format
+#         # For all subsequent messages, we reconstruct the history and append the new message.
 #         for msg in history:
 #             role = 'user' if msg['role'] == 'user' else 'model'
 #             messages.append({"role": role, "parts": [{"text": msg['content']}]})
-    
-#     # Add the current user's message
-#     messages.append({"role": "user", "parts": [{"text": user_input}]})
+        
+#         # Add the current user's message
+#         messages.append({"role": "user", "parts": [{"text": user_input}]})
     
 #     # === API CALL ===
 #     try:
@@ -218,7 +224,7 @@
 # def verify_email():
 #     token = request.args.get('token')
 #     return """
-#     <h2>Email Verified Successfully 🎉</h2>
+#     <h2>Email Verified Successfully! 🎉</h2>
 #     <p>You can now close this tab and login to Brian AI.</p>
 #     """
 
@@ -238,6 +244,7 @@ from flask import send_from_directory
 import smtplib
 from email.mime.text import MIMEText
 import time 
+import random # <--- We've added this import
 
 app = Flask(__name__)
 CORS(app)
@@ -317,7 +324,6 @@ def chat():
     history = request.json.get("history", [])
     user_data = request.json.get("user_data", {})
     
-    # We'll use the user_data to make the first name accessible to the AI.
     full_name = user_data.get('full_name', request.json.get("user_name", "Friend")).strip()
     preferred_name = get_preferred_name(full_name) if full_name != "Friend" else "Friend"
     
@@ -329,29 +335,18 @@ def chat():
     
     messages = []
     
-    # The API expects roles and a structured 'parts' format.
-    # The system prompt is added to the beginning of the conversation.
     if not history:
-        # For the first message, we add a special persona-setting message.
         messages.append({"role": "user", "parts": [{"text": SYSTEM_PROMPT['content']}]})
-        
-        # We also create a special initial reply based on the user's name.
-        # This gives a better first impression than a generic greeting.
         initial_reply = f"Hey there, {preferred_name}! I'm Brian. How can I help you with that today? 😊"
         messages.append({"role": "model", "parts": [{"text": initial_reply}]})
-        
-        # Now we add the user's *actual* first message.
         messages.append({"role": "user", "parts": [{"text": user_input}]})
     else:
-        # For all subsequent messages, we reconstruct the history and append the new message.
         for msg in history:
             role = 'user' if msg['role'] == 'user' else 'model'
             messages.append({"role": role, "parts": [{"text": msg['content']}]})
         
-        # Add the current user's message
         messages.append({"role": "user", "parts": [{"text": user_input}]})
     
-    # === API CALL ===
     try:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
         headers = {"Content-Type": "application/json"}
@@ -367,6 +362,12 @@ def chat():
             raise ValueError("Response from API is empty or malformed.")
 
         reply = response_json['candidates'][0]['content']['parts'][0]['text']
+        
+        # --- NEW LOGIC FOR DYNAMIC NAME CALLING ---
+        # Check if the user is logged in (not "Friend") and randomly decide whether to add their name.
+        if preferred_name != "Friend" and random.random() < 0.5: # 50% chance
+            reply = f"{preferred_name}, {reply}"
+        # --- END OF NEW LOGIC ---
         
         return jsonify({"reply": reply.strip()})
     
