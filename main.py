@@ -115,43 +115,65 @@ def get_preferred_name(full_name):
 @app.route("/chat", methods=["POST"])
 def chat():
     try:
+        # Get user input and context
         user_input = request.json.get("message", "").strip()
         name = request.json.get("user_name", "Friend")
         
-        # PROMPT ENGINEERING - Critical for good responses
-        system_prompt = f"""You are Brian, a helpful AI assistant created by Abdul Wasiq. 
-        - Always respond as Brian
-        - Address the user as {name} (once per response)
-        - Be concise but helpful
-        - For medical questions, add disclaimer
-        - For code, use markdown blocks"""
-        
-        # Build the proper Gemini API request
+        # Structured prompt for Gemini
+        system_prompt = f"""You are Brian, an AI assistant created by Abdul Wasiq. Follow these rules:
+1. Always respond as BRIAN
+2. Address the user as {name} (once per response)
+3. Be concise but helpful
+4. For code: use markdown with syntax highlighting
+5. For medical: add disclaimer
+6. For complex topics: use bullet points"""
+
+        # Build the proper API request
         response = requests.post(
             f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}",
             json={
                 "contents": [{
                     "parts": [
                         {"text": system_prompt},
-                        {"text": f"User: {user_input}"},
-                        {"text": "Respond as Brian:"}
+                        {"text": f"User question: {user_input}"},
+                        {"text": "Brian's response:"}
                     ]
-                }]
+                }],
+                "generationConfig": {
+                    "temperature": 0.7,
+                    "topP": 0.9,
+                    "maxOutputTokens": 1000
+                }
             },
-            timeout=10  # Important for hackathon!
+            timeout=10  # Important timeout
         )
         
-        # Proper response parsing
+        # Parse response properly
         if response.status_code == 200:
             reply = response.json()['candidates'][0]['content']['parts'][0]['text']
-            return jsonify({"reply": reply})
+            
+            # Post-processing for consistent formatting
+            if "```" not in reply and ("code" in user_input or "python" in user_input):
+                reply = f"Here's the implementation:\n```python\n{reply}\n```"
+                
+            return jsonify({
+                "reply": reply,
+                "status": "success"
+            })
+            
         else:
-            return jsonify({"reply": f"🚀 {name}, I'm upgrading my knowledge! Try again in a moment."})
+            return jsonify({
+                "reply": f"🔧 {name}, I'm optimizing my responses. Please try again!",
+                "status": "retry"
+            })
             
     except Exception as e:
-        print(f"Error: {str(e)}")  # Debugging
-        return jsonify({"reply": f"💡 {name}, let me think differently about that..."})
-    
+        print(f"Error: {str(e)}")
+        return jsonify({
+            "reply": f"✨ {name}, let me think differently about that...",
+            "status": "error"
+        })
+        
 @app.route('/update-theme', methods=['POST'])
 def update_theme():
     data = request.get_json()
