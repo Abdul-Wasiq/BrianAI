@@ -1186,8 +1186,13 @@ body:not(.welcome-screen-active) #input-area {
   font-size: 0.75em;
   color: var(--timestamp-color, #888);
   margin-top: 4px;
-  margin-left: 500px; /* align under Brian’s message bubble */
+  display: block;
+  text-align: right; /* Align to right instead of fixed margin */
+  width: 100%; /* Take full width */
+  padding-right: 10px; /* Add some spacing from right edge */
 }
+
+/* For dark mode */
 body.dark-mode .message-timestamp {
   color: #aaa;
 }
@@ -1511,6 +1516,12 @@ body.dark-mode .message-timestamp {
     .sidebar-active ~ .sidebar-overlay {
         display: block;
     }
+
+    .message-timestamp {
+    margin-left: 0; /* Remove the fixed margin */
+    padding-right: 15px; /* Slightly more padding on mobile */
+    font-size: 0.65em; /* Slightly smaller on mobile */
+  }
 
     
     @keyframes fadeIn {
