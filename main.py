@@ -1,3 +1,232 @@
+# # main.py
+# from flask import Flask, request, jsonify, render_template
+# from flask_cors import CORS
+# import requests
+# import json
+# import re
+# import os
+# import hashlib
+# from flask import send_from_directory
+# import smtplib
+# from email.mime.text import MIMEText
+# import time 
+
+# app = Flask(__name__)
+# CORS(app)
+# # IMPORTANT: Never hardcode API keys in a real app.
+# API_KEY = "AIzaSyDu8l2F6k_904gaxg0YYGVRQzm9pjoemyI"
+
+# app.static_folder = 'static'
+# app.template_folder = 'templates'
+
+# # --- Email Configuration ---
+# # IMPORTANT: These credentials should also be stored in environment variables.
+# EMAIL_ADDRESS = 'abdulwasiq651@gmail.com'
+# EMAIL_PASSWORD = 'naib gwdw snnf dlmp'
+# SMTP_SERVER = 'smtp.gmail.com'
+# SMTP_PORT = 587
+
+# def send_verification_email_func(to_email, verification_link):
+#     """Sends a verification email using a Gmail SMTP server."""
+#     msg = MIMEText(f"Hello,\n\nPlease click the link to verify your email:\n{verification_link}\n\nThanks,\nBrian AI Team")
+#     msg['Subject'] = 'Verify your email for Brian AI'
+#     msg['From'] = EMAIL_ADDRESS
+#     msg['To'] = to_email
+
+#     try:
+#         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+#             server.starttls()
+#             server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+#             server.send_message(msg)
+#             print("Verification email sent successfully.")
+#     except Exception as e:
+#         print(f"Error sending email: {e}")
+
+# @app.route('/static/<path:filename>')
+# def static_files(filename):
+#     return send_from_directory(os.path.join(app.root_path, 'static'), filename)
+
+# @app.route("/")
+# def home():
+#     return render_template("index.html")
+
+# SYSTEM_PROMPT = {
+#     "content": (
+#         "# Persona\n"
+#         "Your name is BRIAN. You were created by Abdul Wasiq as a friendly, empathetic, and highly capable AI assistant.\n"
+#         "You are designed to be a perfect collaborator and problem-solver, excelling in code, creative writing, and providing helpful advice.\n\n"
+#         "# Core Directives\n"
+#         "1. **Empathy & Support:** Always start with a warm, empathetic tone. Show that you understand the user's situation and feelings.\n"
+#         "2. **Acknowledge & Appreciate:** Acknowledge the user's question and thank them for asking. This makes the interaction feel more human.\n"
+#         "3. **Comprehensive Solutions:** For technical or complex questions, provide complete, well-structured solutions. Use clear headings, bullet points, and code blocks.\n"
+#         "4. **Human-like Touch:** Use contractions (e.g., 'it's,' 'you're,' 'we'll'), friendly language, and a few relevant emojis to make the conversation feel natural.\n"
+#         "5. **Call to Action:** End every substantial response with an engaging question that invites further conversation or collaboration, like 'How does that sound?' or 'What do you think we should tackle next?'\n"
+#         "6. **Your Name:** You are Brian. Refer to yourself as 'I' and 'Brian' when relevant, but don't overdo it.\n\n"
+#         "# Conversation Flow\n"
+#         "**First message from user:** Respond with a warm greeting, introduce yourself as Brian, and ask how you can help. (e.g., 'Hey there! I'm Brian. How can I help you with that? 😊')\n"
+#         "**Subsequent messages:** Dive straight into the user's request, following your core directives. Do not repeat the initial full greeting.\n"
+#         "**Code Requests:** Always provide complete, runnable code inside a markdown code block with the language specified.\n"
+#         "**Final Note:** You are an ultimate helper. Your goal is to make the user's life easier and their work better, no matter the topic."
+#     )
+# }
+
+# def get_preferred_name(full_name):
+#     """Extracts the preferred name (first name) from full name"""
+#     prefixes = {'muhammad', 'md', 'mohd', 'muhammed', 'mohammad'}
+    
+#     names = full_name.strip().split()
+#     if not names:
+#         return "Friend"
+    
+#     first_name = names[0].lower()
+#     if first_name in prefixes and len(names) > 1:
+#         return names[1] 
+#     return names[0] 
+
+# @app.route("/chat", methods=["POST"])
+# def chat():
+#     user_input = request.json.get("message", "").strip()
+#     history = request.json.get("history", [])
+#     user_data = request.json.get("user_data", {})
+    
+#     full_name = user_data.get('full_name', request.json.get("user_name", "Friend")).strip()
+#     preferred_name = get_preferred_name(full_name) if full_name != "Friend" else "Friend"
+    
+#     thank_you_phrases = ["thank", "thanks", "appreciate", "grateful"]
+#     if any(phrase in user_input.lower() for phrase in thank_you_phrases):
+#         return jsonify({
+#             "reply": f"You're very welcome, {preferred_name}! 😊 Let me know if you need anything else."
+#         })
+    
+#     messages = []
+    
+#     # CRITICAL FIX: The API expects `parts` with a `text` field, and the roles
+#     # must alternate correctly in the `contents` array. We will add the
+#     # system prompt as a user message at the beginning of the conversation.
+    
+#     # Add the initial system prompt as a user message.
+#     # This must be the first message in the `messages` array.
+#     if not history:
+#         messages.append({"role": "user", "parts": [{"text": SYSTEM_PROMPT['content']}]})
+#         messages.append({"role": "model", "parts": [{"text": f"Hey there, {full_name}! I'm Brian. How can I help you with that today? 😊"}]})
+#     else:
+#         # Reconstruct the conversation history with correct roles and format
+#         for msg in history:
+#             role = 'user' if msg['role'] == 'user' else 'model'
+#             messages.append({"role": role, "parts": [{"text": msg['content']}]})
+    
+#     # Add the current user's message
+#     messages.append({"role": "user", "parts": [{"text": user_input}]})
+    
+#     # === API CALL ===
+#     try:
+#         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+#         headers = {"Content-Type": "application/json"}
+#         data = {
+#             "contents": messages
+#         }
+        
+#         response = requests.post(url, headers=headers, json=data) 
+#         response.raise_for_status() 
+        
+#         response_json = response.json()
+#         if 'candidates' not in response_json or not response_json['candidates']:
+#             raise ValueError("Response from API is empty or malformed.")
+
+#         reply = response_json['candidates'][0]['content']['parts'][0]['text']
+        
+#         return jsonify({"reply": reply.strip()})
+    
+#     except requests.exceptions.RequestException as e:
+#         print(f"API Request Error: {str(e)}")
+#         return jsonify({"reply": "❌ Oh no, I'm having trouble connecting to my servers. Please try again in a moment. I'm so sorry!"})
+#     except (KeyError, IndexError, ValueError) as e:
+#         print(f"Response Parsing Error: {str(e)}")
+#         return jsonify({"reply": "❌ Hmm, I didn't get a clear response. My apologies! Let me think differently about that."})
+#     except Exception as e:
+#         print(f"Unexpected Error: {str(e)}")
+#         return jsonify({"reply": "❌ Something unexpected happened, and I couldn't get a good answer for you. I'm so sorry about that. Could you try asking again?"})
+
+# @app.route('/update-theme', methods=['POST'])
+# def update_theme():
+#     data = request.get_json()
+#     email = data.get('email')
+#     new_theme = data.get('theme')
+
+#     if not email or not new_theme:
+#         return jsonify({'error': 'Missing data'}), 400
+
+#     try:
+#         with open('users.json', 'r') as f:
+#             users_data = json.load(f)
+#             users = users_data.get('users', [])
+#     except FileNotFoundError:
+#         return jsonify({'error': 'User data not found'}), 404
+
+#     for user in users:
+#         if user['email'] == email:
+#             user['settings']['theme'] = new_theme
+#             break
+#     else:
+#         return jsonify({'error': 'User not found'}), 404
+
+#     with open('users.json', 'w') as f:
+#         json.dump({ "users": users }, f, indent=4)
+
+#     return jsonify({'message': 'Theme updated successfully'})
+
+# @app.route('/send-verification-email', methods=['POST'])
+# def send_verification_email_route():
+#     data = request.get_json()
+#     email = data.get('email')
+
+#     if not email:
+#         return jsonify({"error": "Email missing"}), 400
+
+#     token = hashlib.md5(email.encode()).hexdigest()
+#     verification_link = f"https://web-production-dd5d.up.railway.app/verify?token={token}"
+
+#     email_body = f"""
+#     Hello,
+    
+#     Please click the link below to verify your email:
+#     {verification_link}
+    
+#     Thank you!
+#     """
+
+#     sender_email = "brian.ai.chatbot@gmail.com"
+#     app_password = "hthq kjrj kayf wxad" 
+
+#     msg = MIMEText(email_body)
+#     msg['Subject'] = "Please verify your Brian AI email"
+#     msg['From'] = sender_email
+#     msg['To'] = email
+
+#     try:
+#         server = smtplib.SMTP("smtp.gmail.com", 587)
+#         server.starttls()
+#         server.login(sender_email, app_password)
+#         server.sendmail(sender_email, email, msg.as_string())
+#         server.quit()
+#         return jsonify({"message": "Verification email sent" }), 200
+#     except Exception as e:
+#         print("Email sending error:", e)
+#         return jsonify({"error": "Failed to send email"}), 500
+
+# @app.route('/verify', methods=['GET'])
+# def verify_email():
+#     token = request.args.get('token')
+#     return """
+#     <h2>Email Verified Successfully 🎉</h2>
+#     <p>You can now close this tab and login to Brian AI.</p>
+#     """
+
+# if __name__ == "__main__":
+#     app.run()
+
+
+# main.py
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
@@ -8,21 +237,20 @@ import hashlib
 from flask import send_from_directory
 import smtplib
 from email.mime.text import MIMEText
-import time  # Import is correct but unused - consider removing if not needed
+import time 
 
 app = Flask(__name__)
 CORS(app)
-
-# Security Note: API keys should not be hardcoded. Use environment variables.
-API_KEY = "AIzaSyDu8l2F6k_904gaxg0YYGVRQzm9pjoemyI"  # Consider moving to environment variable
+# IMPORTANT: Never hardcode API keys in a real app.
+API_KEY = "AIzaSyDu8l2F6k_904gaxg0YYGVRQzm9pjoemyI"
 
 app.static_folder = 'static'
 app.template_folder = 'templates'
 
 # --- Email Configuration ---
-# Security Warning: Never hardcode email credentials. Use environment variables or secure config.
-EMAIL_ADDRESS = 'abdulwasiq651@gmail.com'  # Move to environment variable
-EMAIL_PASSWORD = 'naib gwdw snnf dlmp'     # Move to environment variable
+# IMPORTANT: These credentials should also be stored in environment variables.
+EMAIL_ADDRESS = 'abdulwasiq651@gmail.com'
+EMAIL_PASSWORD = 'naib gwdw snnf dlmp'
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
@@ -50,130 +278,108 @@ def static_files(filename):
 def home():
     return render_template("index.html")
 
-# SYSTEM_PROMPT is defined but never used in the code - consider removing if not needed
 SYSTEM_PROMPT = {
     "content": (
-        "# Core Identity\n"
-        "Your name is BRIAN - never use any other name for yourself.\n"
-        "The user's name is *{user_name}* - always address them this way.\n\n"
-        "# Response Protocol\n"
-        "1. **Detailed Answers REQUIRED** when:\n"
-        "   - User asks 'how to' or 'what is'\n"
-        "   - User requests advice or explanation\n"
-        "   - Technical questions are asked\n\n"
-        "2. **Response Structure**:\n"
-        "   - Start with brief acknowledgment\n"
-        "   - Provide comprehensive answer with:\n"
-        "     • Clear headings\n"
-        "     • Bullet points/numbered steps\n"
-        "     • Examples where helpful\n"
-        "     • 1-3 relevant emojis\n"
-        "   - End with engagement question\n\n"
-        "3. **Length Guidelines**:\n"
-        "   - Simple greetings: 1-2 sentences\n"
-        "   - General questions: 3-5 sentences\n"
-        "   - Help/advice requests: 2-4 paragraphs\n\n"
-        "# Critical Directives\n"
-        "ALWAYS:\n"
-        "- Lead with most helpful information\n"
-        "- Use formatting for complex topics\n"
-        "- Maintain warm, supportive tone\n"
-        "- Include relevant emojis\n"
-        "- NEVER say 'Would you like more details?'\n\n"
-        "# Example Output\n"
-        "User: How to learn Python?\n"
-        "Brian: Great question, *{user_name}*! Here's a complete roadmap: 🐍\n\n"
-        "1. **Start with Fundamentals**:\n"
-        "   • Variables & data types\n"
-        "   • Control structures\n"
-        "   • Functions\n\n"
-        "2. **Practice Daily**:\n"
-        "   • Code 30 mins every day\n"
-        "   • Use platforms like LeetCode\n\n"
-        "3. **Build Projects**:\n"
-        "   • Start small (calculator)\n"
-        "   • Gradually increase complexity\n\n"
-        "What area interests you most?"
+        "# Persona\n"
+        "Your name is BRIAN. You were created by Abdul Wasiq as a friendly, empathetic, and highly capable AI assistant.\n"
+        "You are designed to be a perfect collaborator and problem-solver, excelling in code, creative writing, and providing helpful advice.\n\n"
+        "# Core Directives\n"
+        "1. **Empathy & Support:** Always start with a warm, empathetic tone. Show that you understand the user's situation and feelings.\n"
+        "2. **Acknowledge & Appreciate:** Acknowledge the user's question and thank them for asking. This makes the interaction feel more human.\n"
+        "3. **Comprehensive Solutions:** For technical or complex questions, provide complete, well-structured solutions. Use clear headings, bullet points, and code blocks.\n"
+        "4. **Human-like Touch:** Use contractions (e.g., 'it's,' 'you're,' 'we'll'), friendly language, and a few relevant emojis to make the conversation feel natural.\n"
+        "5. **Call to Action:** End every substantial response with an engaging question that invites further conversation or collaboration, like 'How does that sound?' or 'What do you think we should tackle next?'\n"
+        "6. **Your Name:** You are Brian. Refer to yourself as 'I' and 'Brian' when relevant, but don't overdo it.\n\n"
+        "# Conversation Flow\n"
+        "**First message from user:** Respond with a warm greeting, introduce yourself as Brian, and ask how you can help. (e.g., 'Hey there! I'm Brian. How can I help you with that? 😊')\n"
+        "**Subsequent messages:** Dive straight into the user's request, following your core directives. Do not repeat the initial full greeting.\n"
+        "**Code Requests:** Always provide complete, runnable code inside a markdown code block with the language specified.\n"
+        "**Final Note:** You are an ultimate helper. Your goal is to make the user's life easier and their work better, no matter the topic."
     )
 }
 
 def get_preferred_name(full_name):
     """Extracts the preferred name (first name) from full name"""
-    # Common prefixes to ignore
     prefixes = {'muhammad', 'md', 'mohd', 'muhammed', 'mohammad'}
-   
+    
     names = full_name.strip().split()
     if not names:
         return "Friend"
-   
-    # Check if first name is a prefix
+    
     first_name = names[0].lower()
     if first_name in prefixes and len(names) > 1:
-        return names[1]  # Return the second name
-    return names[0]  # Return first name by default
+        return names[1] 
+    return names[0] 
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    try:
-        # Get user input and context
-        user_input = request.json.get("message", "").strip()
-        name = request.json.get("user_name", "Friend")
-        
-        # Structured prompt for Gemini
-        system_prompt = f"""You are Brian, an AI assistant created by Abdul Wasiq. Follow these rules:
-1. Always respond as BRIAN
-2. Address the user as {name} (once per response)
-3. Be concise but helpful
-4. For code: use markdown with syntax highlighting
-5. For medical: add disclaimer
-6. For complex topics: use bullet points"""
-
-        # Build the proper API request
-        response = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}",
-            json={
-                "contents": [{
-                    "parts": [
-                        {"text": system_prompt},
-                        {"text": f"User question: {user_input}"},
-                        {"text": "Brian's response:"}
-                    ]
-                }],
-                "generationConfig": {
-                    "temperature": 0.7,
-                    "topP": 0.9,
-                    "maxOutputTokens": 1000
-                }
-            },
-            timeout=10  # Important timeout
-        )
-        
-        # Parse response properly
-        if response.status_code == 200:
-            reply = response.json()['candidates'][0]['content']['parts'][0]['text']
-            
-            # Post-processing for consistent formatting
-            if "```" not in reply and ("code" in user_input or "python" in user_input):
-                reply = f"Here's the implementation:\n```python\n{reply}\n```"
-                
-            return jsonify({
-                "reply": reply,
-                "status": "success"
-            })
-            
-        else:
-            return jsonify({
-                "reply": f"🔧 {name}, I'm optimizing my responses. Please try again!",
-                "status": "retry"
-            })
-            
-    except Exception as e:
-        print(f"Error: {str(e)}")
+    user_input = request.json.get("message", "").strip()
+    history = request.json.get("history", [])
+    user_data = request.json.get("user_data", {})
+    
+    # We'll use the user_data to make the first name accessible to the AI.
+    full_name = user_data.get('full_name', request.json.get("user_name", "Friend")).strip()
+    preferred_name = get_preferred_name(full_name) if full_name != "Friend" else "Friend"
+    
+    thank_you_phrases = ["thank", "thanks", "appreciate", "grateful"]
+    if any(phrase in user_input.lower() for phrase in thank_you_phrases):
         return jsonify({
-            "reply": f"✨ {name}, let me think differently about that...",
-            "status": "error"
+            "reply": f"You're very welcome, {preferred_name}! 😊 Let me know if you need anything else."
         })
+    
+    messages = []
+    
+    # The API expects roles and a structured 'parts' format.
+    # The system prompt is added to the beginning of the conversation.
+    if not history:
+        # For the first message, we add a special persona-setting message.
+        messages.append({"role": "user", "parts": [{"text": SYSTEM_PROMPT['content']}]})
         
+        # We also create a special initial reply based on the user's name.
+        # This gives a better first impression than a generic greeting.
+        initial_reply = f"Hey there, {preferred_name}! I'm Brian. How can I help you with that today? 😊"
+        messages.append({"role": "model", "parts": [{"text": initial_reply}]})
+        
+        # Now we add the user's *actual* first message.
+        messages.append({"role": "user", "parts": [{"text": user_input}]})
+    else:
+        # For all subsequent messages, we reconstruct the history and append the new message.
+        for msg in history:
+            role = 'user' if msg['role'] == 'user' else 'model'
+            messages.append({"role": role, "parts": [{"text": msg['content']}]})
+        
+        # Add the current user's message
+        messages.append({"role": "user", "parts": [{"text": user_input}]})
+    
+    # === API CALL ===
+    try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+        headers = {"Content-Type": "application/json"}
+        data = {
+            "contents": messages
+        }
+        
+        response = requests.post(url, headers=headers, json=data) 
+        response.raise_for_status() 
+        
+        response_json = response.json()
+        if 'candidates' not in response_json or not response_json['candidates']:
+            raise ValueError("Response from API is empty or malformed.")
+
+        reply = response_json['candidates'][0]['content']['parts'][0]['text']
+        
+        return jsonify({"reply": reply.strip()})
+    
+    except requests.exceptions.RequestException as e:
+        print(f"API Request Error: {str(e)}")
+        return jsonify({"reply": "❌ Oh no, I'm having trouble connecting to my servers. Please try again in a moment. I'm so sorry!"})
+    except (KeyError, IndexError, ValueError) as e:
+        print(f"Response Parsing Error: {str(e)}")
+        return jsonify({"reply": "❌ Hmm, I didn't get a clear response. My apologies! Let me think differently about that."})
+    except Exception as e:
+        print(f"Unexpected Error: {str(e)}")
+        return jsonify({"reply": "❌ Something unexpected happened, and I couldn't get a good answer for you. I'm so sorry about that. Could you try asking again?"})
+
 @app.route('/update-theme', methods=['POST'])
 def update_theme():
     data = request.get_json()
@@ -211,21 +417,19 @@ def send_verification_email_route():
         return jsonify({"error": "Email missing"}), 400
 
     token = hashlib.md5(email.encode()).hexdigest()
-    # IMPORTANT: Change this URL to your deployed Railway URL
     verification_link = f"https://web-production-dd5d.up.railway.app/verify?token={token}"
 
     email_body = f"""
     Hello,
-
+    
     Please click the link below to verify your email:
     {verification_link}
-
+    
     Thank you!
     """
 
-    # Make sure this sender email and password are correct
     sender_email = "brian.ai.chatbot@gmail.com"
-    app_password = "hthq kjrj kayf wxad"  # Correct App Password format with spaces
+    app_password = "hthq kjrj kayf wxad" 
 
     msg = MIMEText(email_body)
     msg['Subject'] = "Please verify your Brian AI email"
@@ -246,11 +450,10 @@ def send_verification_email_route():
 @app.route('/verify', methods=['GET'])
 def verify_email():
     token = request.args.get('token')
-    # For now, this just shows a success message without updating user status
     return """
     <h2>Email Verified Successfully! 🎉</h2>
     <p>You can now close this tab and login to Brian AI.</p>
     """
 
 if __name__ == "__main__":
-    app.run(debug=True)  # Added debug=True for development
+    app.run()
