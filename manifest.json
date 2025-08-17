@@ -1,7 +1,7 @@
 {
-  "name": "Brian AI Chatbot",
-  "short_name": "Brian AI",
-  "start_url": "./",
+  "name": "Brian AI Chatbot",  
+  "short_name": "Brian AI",    
+  "start_url": "/",
   "display": "standalone",
   "icons": [
     {
