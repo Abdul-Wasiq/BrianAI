@@ -1673,7 +1673,7 @@ document.querySelectorAll('.input-action-button').forEach(button => {
     }
 
     // Random delay between 1-2 seconds
-    const delay = 1000 + Math.random() * 1000;
+    const delay = 1000 + Math.random() * 6000;
 
     setTimeout(() => {
       // 3. Restore original icon
@@ -1685,9 +1685,9 @@ document.querySelectorAll('.input-action-button').forEach(button => {
 
       // Set different messages based on which button
       if (this.querySelector('.fa-video')) {
-        notification.textContent = 'Privacy first. Unlocking soon.';
+        notification.textContent = 'Privacy first. We’ve temporarily paused this feature to perform a security review. It will be back online soon.';
       } else if (this.querySelector('.fa-desktop')) {
-        notification.textContent = 'Privacy first. Unlocking soon.';
+        notification.textContent = 'Privacy first. We’ve temporarily paused this feature to perform a security review. It will be back online soon.';
       } else {
         notification.textContent = 'Voice input currently unavailable';
       }
@@ -1698,7 +1698,7 @@ document.querySelectorAll('.input-action-button').forEach(button => {
       // Auto-remove after 3 seconds
       setTimeout(() => {
         notification.remove();
-      }, 3000);
+      }, 6000);
 
       // Restore tooltip, but only if it exists
       if (tooltip) {
