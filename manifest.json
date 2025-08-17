@@ -22,5 +22,17 @@
       "sizes": "512x512",
       "type": "image/png"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "placeholder-screenshot-1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    },
+    {
+      "src": "placeholder-screenshot-2.png",
+      "sizes": "720x1280",
+      "type": "image/png"
+    }
   ]
 }
