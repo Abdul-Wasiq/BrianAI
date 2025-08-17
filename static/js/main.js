@@ -1662,7 +1662,7 @@ document.querySelectorAll('.input-action-button').forEach(button => {
     // Show loading state
     icon.className = 'fas fa-spinner fa-spin';
 
-    // 2. Remove tooltip during loading
+    // 2. Remove tooltip during loading 
     const tooltip = this.querySelector('.tooltip');
     
     // Check if the tooltip element exists before trying to use it
