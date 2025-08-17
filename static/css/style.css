@@ -210,6 +210,11 @@ body.dark-mode .sidebar-base:not(.expanded):hover {
 .title {
     margin-right: 0px;
 }
+.title h1 {
+    font-size: inherit; /* This will make the h1 the same size as its parent div */
+    margin: 0; /* This removes any extra spacing around the h1 tag */
+    padding: 0; /* This removes any padding around the h1 tag */
+}
 .login_button {
     background-color: #1E90FF; /* Dodger Blue */
     color: white;              /* Make text readable */

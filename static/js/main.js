@@ -1698,7 +1698,7 @@ document.querySelectorAll('.input-action-button').forEach(button => {
       // Auto-remove after 3 seconds
       setTimeout(() => {
         notification.remove();
-      }, 6000);
+      }, 6000); // Change this line: Increased the duration to 6000ms (6 seconds)
 
       // Restore tooltip, but only if it exists
       if (tooltip) {
