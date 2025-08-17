@@ -1652,34 +1652,37 @@ async function startNewChat() {
 }
 
 
-// Add click handlers to all action buttons
 document.querySelectorAll('.input-action-button').forEach(button => {
   button.addEventListener('click', function(e) {
-    e.preventDefault(); // Prevent default behavior
-    
-    // Get the icon inside the button
+    e.preventDefault();
+
     const icon = this.querySelector('i');
     const originalIcon = icon.className;
-    
-    // 1. Show loading state
-    icon.className = 'fas fa-spinner fa-spin'; // Spinner icon
-    
+
+    // Show loading state
+    icon.className = 'fas fa-spinner fa-spin';
+
     // 2. Remove tooltip during loading
     const tooltip = this.querySelector('.tooltip');
-    const originalDisplay = tooltip.style.display;
-    tooltip.style.display = 'none';
     
+    // Check if the tooltip element exists before trying to use it
+    let originalDisplay = ''; // Default value
+    if (tooltip) {
+      originalDisplay = tooltip.style.display;
+      tooltip.style.display = 'none';
+    }
+
     // Random delay between 1-2 seconds
     const delay = 1000 + Math.random() * 1000;
-    
+
     setTimeout(() => {
       // 3. Restore original icon
       icon.className = originalIcon;
-      
+
       // 4. Show red notification
       const notification = document.createElement('div');
       notification.className = 'feature-notification';
-      
+
       // Set different messages based on which button
       if (this.querySelector('.fa-video')) {
         notification.textContent = 'Privacy first. Unlocking soon.';
@@ -1688,18 +1691,19 @@ document.querySelectorAll('.input-action-button').forEach(button => {
       } else {
         notification.textContent = 'Voice input currently unavailable';
       }
-      
+
       // Add to DOM
       document.body.appendChild(notification);
-      
+
       // Auto-remove after 3 seconds
       setTimeout(() => {
         notification.remove();
       }, 3000);
-      
-      // Restore tooltip
-      tooltip.style.display = originalDisplay;
-      
+
+      // Restore tooltip, but only if it exists
+      if (tooltip) {
+        tooltip.style.display = originalDisplay;
+      }
     }, delay);
   });
 });
