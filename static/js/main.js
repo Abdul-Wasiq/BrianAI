@@ -1684,7 +1684,7 @@ document.querySelectorAll('.input-action-button').forEach(button => {
       if (this.querySelector('.fa-video')) {
         notification.textContent = 'Privacy first. Unlocking soon.';
       } else if (this.querySelector('.fa-desktop')) {
-        notification.textContent = 'Deployment done — open terminal to enter prompt.';
+        notification.textContent = 'Privacy first. Unlocking soon.';
       } else {
         notification.textContent = 'Voice input currently unavailable';
       }
