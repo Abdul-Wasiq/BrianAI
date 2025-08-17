@@ -1380,7 +1380,7 @@ body.dark-mode .message-timestamp {
   bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgb(13, 107, 13);
+  background: rgb(245, 10, 10);
   color: white;
   padding: 10px 20px;
   border-radius: 5px;
