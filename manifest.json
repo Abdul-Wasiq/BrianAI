@@ -1,13 +1,14 @@
 {
-  "name": "Brian AI Chatbot",  
-  "short_name": "Brian AI",    
-  "start_url": "/",
+  "name": "Brian AI Chatbot", 
+  "short_name": "Brian AI",   
+  "start_url": "/",           
   "display": "standalone",
   "icons": [
     {
-      "src": "/static/favicon/favicon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/icon-192x192.png",  
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"             
     }
   ]
 }

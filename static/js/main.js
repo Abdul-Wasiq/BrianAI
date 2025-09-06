@@ -1,3 +1,5 @@
+import Dictate from './Dictate.js';
+
 // Expose functions to global scope
 window.handleSidebarHover = handleSidebarHover;
 window.toggleSidebar = toggleSidebar;
@@ -700,6 +702,21 @@ function updateThemeText(newTheme) {
     }
 }
 
+// --- DICTATE FEATURE SETUP - STEP 1 ---
+// 1. Initialize the Dictate class
+let dictateManager;
+try {
+    dictateManager = new Dictate(); // This will run the constructor and log our message
+} catch (error) {
+    console.error("❌ Failed to load Dictate module:", error);
+}
+
+// 2. Let's test the connection right away.
+if (dictateManager) {
+    // Call our test method
+    const testMessage = dictateManager.testConnection();
+    console.log(testMessage);
+}
 
 
 
