@@ -15,15 +15,18 @@ import random # <--- We've added this import
 app = Flask(__name__)
 CORS(app)
 # IMPORTANT: Never hardcode API keys in a real app.
-API_KEY = "AIzaSyDu8l2F6k_904gaxg0YYGVRQzm9pjoemyI"
+# API_KEY = "AIzaSyDu8l2F6k_904gaxg0YYGVRQzm9pjoemyI"
+API_KEY = os.environ.get("API_KEY")
 
 app.static_folder = 'static'
 app.template_folder = 'templates'
 
 # --- Email Configuration ---
 # IMPORTANT: These credentials should also be stored in environment variables.
-EMAIL_ADDRESS = 'abdulwasiq651@gmail.com'
-EMAIL_PASSWORD = 'naib gwdw snnf dlmp'
+# EMAIL_ADDRESS = 'abdulwasiq651@gmail.com'
+EMAIL_ADDRESS = os.environ.get("EMAIL_ADDRESS")
+# EMAIL_PASSWORD = 'naib gwdw snnf dlmp'
+EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
@@ -221,6 +224,5 @@ def verify_email():
     <h2>Email Verified Successfully! 🎉</h2>
     <p>You can now close this tab and login to Brian AI.</p>
     """
-
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=5000)
