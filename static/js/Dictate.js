@@ -14,5 +14,4 @@ class Dictate {
     }
 }
 
-// This line makes the class available for import
-export default Dictate;
+// We don't use 'export' anymore. The class is now global.

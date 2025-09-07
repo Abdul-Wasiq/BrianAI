@@ -1,6 +1,3 @@
-// main.js - Change the import line to this:
-import Dictate from '/static/js/Dictate.js';
-
 alert("Working")
 // Expose functions to global scope
 window.handleSidebarHover = handleSidebarHover;
@@ -694,14 +691,14 @@ document.addEventListener("DOMContentLoaded", function() {
       openAuthModal();
     }
   }, 100);
-// DICTATE
-  // --- DICTATE FEATURE SETUP - STEP 1 ---
+// --- DICTATE FEATURE SETUP - STEP 1 ---
 // 1. Initialize the Dictate class
 let dictateManager;
 try {
-    dictateManager = new Dictate(); // This will run the constructor and log our message
+    dictateManager = new Dictate(); // Now we use the global 'Dictate' class
+    console.log("✅ Dictate manager created!");
 } catch (error) {
-    console.error("❌ Failed to load Dictate module:", error);
+    console.error("❌ Failed to create Dictate manager:", error);
 }
 
 // 2. Let's test the connection right away.
@@ -710,6 +707,7 @@ if (dictateManager) {
     const testMessage = dictateManager.testConnection();
     console.log(testMessage);
 }
+// --- END OF DICTATE SETUP ---
 
 });
 
