@@ -52,7 +52,12 @@ def static_files(filename):
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("index.html")  # ← CHANGE BACK TO THIS
+
+# Add this to serve static files correctly
+# @app.route('/<path:path>')
+# def static_file(path):
+#     return app.send_static_file(path)
 
 SYSTEM_PROMPT = {
     "content": (
