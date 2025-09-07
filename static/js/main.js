@@ -1,8 +1,5 @@
 import Dictate from './Dictate.js';
 
-console.log("✅ main.js is loaded successfully!");
-alert("JavaScript is working! main.js loaded.");
-
 // Expose functions to global scope
 window.handleSidebarHover = handleSidebarHover;
 window.toggleSidebar = toggleSidebar;
