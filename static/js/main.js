@@ -1,4 +1,4 @@
-// import Dictate from './Dictate.js';
+import Dictate from './Dictate.js';
 
 console.log("✅ main.js is loaded successfully!");
 alert("JavaScript is working! main.js loaded.");
@@ -695,6 +695,23 @@ document.addEventListener("DOMContentLoaded", function() {
       openAuthModal();
     }
   }, 100);
+// DICTATE
+  // --- DICTATE FEATURE SETUP - STEP 1 ---
+// 1. Initialize the Dictate class
+let dictateManager;
+try {
+    dictateManager = new Dictate(); // This will run the constructor and log our message
+} catch (error) {
+    console.error("❌ Failed to load Dictate module:", error);
+}
+
+// 2. Let's test the connection right away.
+if (dictateManager) {
+    // Call our test method
+    const testMessage = dictateManager.testConnection();
+    console.log(testMessage);
+}
+
 });
 
 function updateThemeText(newTheme) {
