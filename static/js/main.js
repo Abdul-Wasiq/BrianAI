@@ -1,4 +1,6 @@
-// import Dictate from './Dictate.js';
+// main.js - Change the import line to this:
+import Dictate from '/static/js/Dictate.js';
+
 alert("Working")
 // Expose functions to global scope
 window.handleSidebarHover = handleSidebarHover;
