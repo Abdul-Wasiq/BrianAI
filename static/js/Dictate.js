@@ -1,14 +1,12 @@
 // static/js/Dictate.js
 class Dictate {
-    constructor(statusElId, outputElId) {
-        this.statusEl = document.getElementById(statusElId);
-        this.outputEl = document.getElementById(outputElId);
-        this.transcript = ""; // store last result
+    constructor() {
+        this.transcript = ""; // store the latest recognized text
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
         if (!SpeechRecognition) {
-            this.statusEl.textContent = "Status: Browser does not support speech recognition.";
+            console.error("❌ Browser does not support speech recognition.");
             this.recognition = null;
         } else {
             this.recognition = new SpeechRecognition();
@@ -18,29 +16,24 @@ class Dictate {
 
             this.recognition.onresult = (event) => {
                 this.transcript = event.results[0][0].transcript;
-                this.outputEl.innerHTML = `<strong>${this.transcript}</strong>`;
-                this.statusEl.textContent = "Status: Success!";
+                console.log("🎤 Transcript:", this.transcript);
             };
 
             this.recognition.onerror = (event) => {
-                this.statusEl.textContent = `Status: Error: ${event.error}`;
-            };
-
-            this.recognition.onend = () => {
-                this.statusEl.textContent = "Status: Listening stopped.";
+                console.error("Speech Recognition Error:", event.error);
             };
         }
     }
 
     start() {
         if (!this.recognition) return;
+        this.transcript = ""; // reset before each start
         this.recognition.start();
     }
 
     stop() {
         if (!this.recognition) return;
         this.recognition.stop();
-        this.statusEl.textContent = "Status: Manually stopped.";
     }
 
     getTranscript() {
