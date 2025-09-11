@@ -1,4 +1,6 @@
-alert("Working")
+// alert("Working")
+const dictate = new Dictate();
+
 // Expose functions to global scope
 window.handleSidebarHover = handleSidebarHover;
 window.toggleSidebar = toggleSidebar;
@@ -691,22 +693,27 @@ document.addEventListener("DOMContentLoaded", function() {
       openAuthModal();
     }
   }, 100);
-// --- DICTATE FEATURE SETUP - STEP 1 ---
-// 1. Initialize the Dictate class
-let dictateManager;
-try {
-    dictateManager = new Dictate(); // Now we use the global 'Dictate' class
-    console.log("✅ Dictate manager created!");
-} catch (error) {
-    console.error("❌ Failed to create Dictate manager:", error);
+// --- DICTATE(Control when clicked on button then run the functions which we made in bottom) ---
+    // Listen for clicks on the show text button
+    const showTextBtn = document.getElementById('dictation-show-text-btn');
+    if (showTextBtn) {
+        showTextBtn.addEventListener('click', showTextDictation);
+    }
+
+    const sendBtn = document.getElementById('dictation-send-btn');
+    if (sendBtn) {
+      sendBtn.addEventListener('click', () => {
+      sendDictation();
+    });
 }
 
-// 2. Let's test the connection right away.
-if (dictateManager) {
-    // Call our test method
-    const testMessage = dictateManager.testConnection();
-    console.log(testMessage);
+    const stopBtn = document.getElementById('dictation-close-btn');
+    if (stopBtn) {
+     stopBtn.addEventListener('click', () => {
+     stopDictation();
+  });
 }
+
 // --- END OF DICTATE SETUP ---
 
 });
@@ -1369,7 +1376,7 @@ userInputTextarea.addEventListener("keydown", function (e) {
             fullscreenIcon.className = "fas fa-expand-alt";
         }
         adjustTextareaHeight(); // Re-adjust height in new size
-        userInputTextarea.focus(); // Keep focus on the textarea
+        userInputTextarea.focus(); // Keep focus on the textarea 
     }
 
 
@@ -1668,18 +1675,26 @@ async function startNewChat() {
   document.getElementById("userInput").focus();
 }
 
-
+        // === [PHASE 1] === 
 document.querySelectorAll('.input-action-button').forEach(button => {
   button.addEventListener('click', function(e) {
     e.preventDefault();
 
+    // Check if the clicked button is our dictate button
+    if (this.classList.contains('dictate-button')) {
+      // If it is, call our new function and STOP the rest of the code from running
+      handleDictateButtonClick();
+      return; // This exits the function early
+    }
+
+    // The code below will only run for non-dictate buttons (video and desktop)
     const icon = this.querySelector('i');
     const originalIcon = icon.className;
 
     // Show loading state
     icon.className = 'fas fa-spinner fa-spin';
 
-    // 2. Remove tooltip during loading 
+    // Remove tooltip during loading 
     const tooltip = this.querySelector('.tooltip');
     
     // Check if the tooltip element exists before trying to use it
@@ -1693,10 +1708,10 @@ document.querySelectorAll('.input-action-button').forEach(button => {
     const delay = 1000 + Math.random() * 6000;
 
     setTimeout(() => {
-      // 3. Restore original icon
+      // Restore original icon
       icon.className = originalIcon;
 
-      // 4. Show red notification
+      // Show red notification
       const notification = document.createElement('div');
       notification.className = 'feature-notification';
 
@@ -1705,17 +1720,15 @@ document.querySelectorAll('.input-action-button').forEach(button => {
         notification.textContent = 'Privacy first. We’ve temporarily paused this feature to perform a security review. It will be back online soon.';
       } else if (this.querySelector('.fa-desktop')) {
         notification.textContent = 'Privacy first. We’ve temporarily paused this feature to perform a security review. It will be back online soon.';
-      } else {
-        notification.textContent = 'Voice input currently unavailable';
       }
 
       // Add to DOM
       document.body.appendChild(notification);
 
-      // Auto-remove after 3 seconds
+      // Auto-remove after 6 seconds
       setTimeout(() => {
         notification.remove();
-      }, 6000); // Change this line: Increased the duration to 6000ms (6 seconds)
+      }, 6000);
 
       // Restore tooltip, but only if it exists
       if (tooltip) {
@@ -1724,3 +1737,74 @@ document.querySelectorAll('.input-action-button').forEach(button => {
     }, delay);
   });
 });
+
+/**
+ * This function handles the click on the dictate (microphone) button.
+ */
+// === [PHASE 2] === 
+/**
+ * This function handles the click on the dictate (microphone) button.
+ */
+function handleDictateButtonClick() {
+    console.log("✅ Dictate button clicked! The new feature is connected.");
+    dictate.start();
+    // Get the input area element
+    const inputArea = document.getElementById('input-area');
+    const fullscreenBtn = document.querySelector('.input-fullscreen-toggle');
+    
+    // Toggle the dictation-active state
+    const isNowActive = !inputArea.classList.contains('dictation-active');
+    inputArea.classList.toggle('dictation-active');
+    
+    if (isNowActive) {
+        console.log("🎤 Dictation mode STARTED.");
+        fullscreenBtn.style.display = "none"; 
+        // We will start the speech recognition and animation here later
+    } else {
+        console.log("⏹️ Dictation mode STOPPED.");
+        fullscreenBtn.style.display = "inline-block";
+        // We will stop the speech recognition here later
+    }
+}
+
+// NEW: Function to STOP dictation and PUT text in input box
+  // NEW: Function to STOP dictation and put text in input box
+function stopDictation() {
+    console.log("⏹️ Stop button clicked.");
+    const inputArea = document.getElementById('input-area');
+    inputArea.classList.remove('dictation-active'); // Hide dictate UI
+    dictate.stop();
+    // Add this line ^^^^
+    
+    // ** In Phase 5, we will add the transcribed text here **
+    // document.getElementById('userInput').value = transcribedText;
+}
+
+// NEW: Function to STOP dictation and SEND text directly to Brian
+function sendDictation() {
+    console.log("📤 Send button clicked.");
+    const inputArea = document.getElementById('input-area');
+    inputArea.classList.remove('dictation-active'); // Hide dictate UI
+    // Add this line ^^^^
+    
+    // ** In Phase 5, we will add the transcribed text here **
+    // const transcribedText = "This is a test transcript.";
+    // document.getElementById('userInput').value = transcribedText;
+    // sendMessage(); // This is your existing function to send the message
+}
+
+// NEW: Function to STOP dictation and PUT text in input box
+function showTextDictation() {
+    console.log("Show Text button clicked.");
+    const inputArea = document.getElementById('input-area');
+    inputArea.classList.remove('dictation-active'); // Hide dictate UI
+    // This line was already here, which is why it worked!
+    
+    // ** In Phase 5, we will add the transcribed text here **
+    // For now, let's just test with dummy text
+    document.getElementById('userInput').value = dictate.getTranscript();
+    adjustTextareaHeight(); // Your existing function to resize the input
+}
+
+// [PHASE 2 END]
+// [PHASE 1 END]

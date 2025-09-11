@@ -1,17 +1,51 @@
 // static/js/Dictate.js
-// This is the module for our Dictate feature.
-
 class Dictate {
-    constructor() {
-        console.log("✅ Dictate Module has been loaded successfully!");
-        this.isListening = false; // Simple state flag
+    constructor(statusElId, outputElId) {
+        this.statusEl = document.getElementById(statusElId);
+        this.outputEl = document.getElementById(outputElId);
+        this.transcript = ""; // store last result
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            this.statusEl.textContent = "Status: Browser does not support speech recognition.";
+            this.recognition = null;
+        } else {
+            this.recognition = new SpeechRecognition();
+            this.recognition.continuous = false;
+            this.recognition.interimResults = false;
+            this.recognition.lang = 'en-US';
+
+            this.recognition.onresult = (event) => {
+                this.transcript = event.results[0][0].transcript;
+                this.outputEl.innerHTML = `<strong>${this.transcript}</strong>`;
+                this.statusEl.textContent = "Status: Success!";
+            };
+
+            this.recognition.onerror = (event) => {
+                this.statusEl.textContent = `Status: Error: ${event.error}`;
+            };
+
+            this.recognition.onend = () => {
+                this.statusEl.textContent = "Status: Listening stopped.";
+            };
+        }
     }
 
-    // A simple method we can call to test our connection
-    testConnection() {
-        console.log("🔊 Dictate.testConnection() was called! Everything is linked up.");
-        return "This text came from the Dictate module!";
+    start() {
+        if (!this.recognition) return;
+        this.recognition.start();
+    }
+
+    stop() {
+        if (!this.recognition) return;
+        this.recognition.stop();
+        this.statusEl.textContent = "Status: Manually stopped.";
+    }
+
+    getTranscript() {
+        return this.transcript;
     }
 }
 
-// We don't use 'export' anymore. The class is now global.
+window.Dictate = Dictate;

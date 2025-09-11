@@ -52,3 +52,7 @@ SignUp – (113)
 Login – (167)
 running the server – (192)
 
+
+Dictate Featire:
+- Phase1(PHASE 1: SETUP & CONNECTION) (Search PHASE 1)
+- 

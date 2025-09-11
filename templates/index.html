@@ -281,13 +281,46 @@
                         <i class="fas fa-desktop"></i>
                         <!-- <span class="tooltip">Screen Sharing Coming Soon!</span> -->
                     </button>
-                    <button class="input-action-button">
+                    <button class="input-action-button dictate-button">
                         <i class="fas fa-microphone"></i>
                         <!-- <span class="tooltip">Voice Input Coming Soon!</span> -->
                     </button>
                 </div>
                 <button onclick="sendMessage()">Send</button>
             </div>
+
+<!-- === DICTATE FEATURE UI: START === -->
+<div class="dictation-ui">
+    <div class="spectrogram-container">
+        <!-- Add a small close button at the top right -->
+        <button class="dictation-close-btn" id="dictation-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="spectrogram" id="spectrogram">
+            <div class="spectrogram-bar"></div>
+            <div class="spectrogram-bar"></div>
+            <div class="spectrogram-bar"></div>
+            <div class="spectrogram-bar"></div>
+            <div class="spectrogram-bar"></div>
+            <div class="spectrogram-bar"></div>
+            <div class="spectrogram-bar"></div>
+        </div>
+        <div class="timer" id="dictation-timer">00:00</div>
+    </div>
+    <div class="dictation-controls">
+        <!-- NEW: Button to stop and show text -->
+    <button id="dictation-show-text-btn" class="dictation-control-btn show-text">
+        <i class="fas fa-eye"></i> Show Text
+    </button>
+    
+        <!-- Changed to a single, clear "Send" button -->
+        <button id="dictation-send-btn" class="dictation-control-btn send">
+            <i class="fas fa-paper-plane"></i> Send to Brian
+        </button>
+    </div>
+</div>
+<!-- === DICTATE FEATURE UI: END === -->
         </div>
     </div>
 <!-- === [INPUT BOX - ENDING] === -->

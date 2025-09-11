@@ -1394,6 +1394,133 @@ body.dark-mode .message-timestamp {
   animation: fadeInOut 2.5s ease-out forwards;
 }
 
+/* === DICTATE FEATURE UI: START === */
+
+/* 1. HIDE normal UI, SHOW dictation UI when active */
+#input-area.dictation-active .input-actions-row,
+#input-area.dictation-active #userInput {
+    display: none !important;
+}
+#input-area.dictation-active .dictation-ui {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+/* 2. Styles for the dictation UI container */
+.dictation-ui {
+    display: none; /* Hidden by default */
+}
+
+/* 3. Styles for the spectrometer container */
+.spectrogram-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+/* 4. Styles for the animated spectrogram */
+.spectrogram {
+    flex: 1;
+    display: flex;
+    align-items: end;
+    justify-content: space-around;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 0 5px;
+}
+body.dark-mode .spectrogram {
+    background: rgba(255, 255, 255, 0.05);
+}
+.spectrogram-bar {
+    width: 6px;
+    background-color: var(--button-bg); /* Use your theme's main color */
+    border-radius: 3px;
+    height: 10%; /* Start with low bars */
+    animation: pulse 1.5s infinite ease-in-out;
+}
+/* Each bar pulses at a slightly different time */
+.spectrogram-bar:nth-child(1) { animation-delay: 0.0s; }
+.spectrogram-bar:nth-child(2) { animation-delay: 0.2s; }
+.spectrogram-bar:nth-child(3) { animation-delay: 0.4s; }
+.spectrogram-bar:nth-child(4) { animation-delay: 0.6s; }
+.spectrogram-bar:nth-child(5) { animation-delay: 0.8s; }
+.spectrogram-bar:nth-child(6) { animation-delay: 1.0s; }
+.spectrogram-bar:nth-child(7) { animation-delay: 1.2s; }
+
+@keyframes pulse {
+    0%, 100% { height: 10%; }
+    50% { height: 100%; }
+}
+
+/* 5. Timer style */
+.timer {
+    font-variant-numeric: tabular-nums; /* Makes numbers same width */
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+/* 6. Control buttons */
+.dictation-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.dictation-control-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+}
+.dictation-control-btn.stop {
+    background-color: #ff4d4d;
+    color: white;
+}
+.dictation-control-btn.send {
+    background-color: var(--button-bg);
+    color: white;
+}
+.dictation-control-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Ensure the dictate UI has a high z-index to appear above other elements */
+#input-area.dictation-active {
+    z-index: 3; /* Higher than the fullscreen toggle's z-index: 3 */
+}
+
+/* Ensure the close button is on top of everything */
+.dictation-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.2em;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    z-index: 4; /* This is the key line: higher than the fullscreen button */
+}
+.dictation-close-btn:hover {
+    opacity: 1;
+}
+.dictation-control-btn.show-text {
+    background-color: #666; /* A neutral gray */
+    color: white;
+}
+/* === DICTATE FEATURE UI: END === */
+
+
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
   15% { opacity: 1; transform: translateX(-50%) translateY(0); }
