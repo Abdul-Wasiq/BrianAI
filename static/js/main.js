@@ -1747,38 +1747,39 @@ document.querySelectorAll('.input-action-button').forEach(button => {
  */
 function handleDictateButtonClick() {
     console.log("✅ Dictate button clicked! The new feature is connected.");
+
+    // Clear previous transcript before starting new dictation
+    dictate.transcript = "";
+
     dictate.start();
-    // Get the input area element
+
     const inputArea = document.getElementById('input-area');
     const fullscreenBtn = document.querySelector('.input-fullscreen-toggle');
     
-    // Toggle the dictation-active state
     const isNowActive = !inputArea.classList.contains('dictation-active');
     inputArea.classList.toggle('dictation-active');
     
     if (isNowActive) {
         console.log("🎤 Dictation mode STARTED.");
         fullscreenBtn.style.display = "none"; 
-        // We will start the speech recognition and animation here later
     } else {
         console.log("⏹️ Dictation mode STOPPED.");
         fullscreenBtn.style.display = "inline-block";
-        // We will stop the speech recognition here later
     }
 }
+
 
 // NEW: Function to STOP dictation and PUT text in input box
   // NEW: Function to STOP dictation and put text in input box
 function stopDictation() {
     console.log("⏹️ Stop button clicked.");
     const inputArea = document.getElementById('input-area');
-    inputArea.classList.remove('dictation-active'); // Hide dictate UI
+    inputArea.classList.remove('dictation-active');
     dictate.stop();
-    // Add this line ^^^^
-    
-    // ** In Phase 5, we will add the transcribed text here **
-    // document.getElementById('userInput').value = transcribedText;
+
+    dictate.transcript = ""; // <-- clear transcript here too
 }
+
 
 // NEW: Function to STOP dictation and SEND text directly to Brian
 function sendDictation() {
