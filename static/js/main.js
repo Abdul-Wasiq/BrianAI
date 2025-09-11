@@ -1797,15 +1797,13 @@ function sendDictation() {
 // NEW: Function to STOP dictation and PUT text in input box
 function showTextDictation() {
     console.log("Show Text button clicked.");
-    const inputArea = document.getElementById('input-area');
-    inputArea.classList.remove('dictation-active'); // Hide dictate UI
-    // This line was already here, which is why it worked!
-    
-    // ** In Phase 5, we will add the transcribed text here **
-    // For now, let's just test with dummy text
-    document.getElementById('userInput').value = dictate.getTranscript();
-    adjustTextareaHeight(); // Your existing function to resize the input
+    const transcript = window.dictate.getTranscript();
+    console.log("📌 Transcript to show:", transcript);
+
+    document.getElementById('userInput').value = transcript;
+    adjustTextareaHeight();
 }
+
 
 // [PHASE 2 END]
 // [PHASE 1 END]
