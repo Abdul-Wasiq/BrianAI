@@ -15,22 +15,23 @@ class Dictate {
     let interimTranscript = "";
 
     for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcriptChunk = event.results[i][0].transcript;
+        const transcriptChunk = event.results[i][0].transcript.trim();
 
         if (event.results[i].isFinal) {
-            // ✅ Save final result ONCE
+            // ✅ Save confirmed text ONCE
             this.transcript += transcriptChunk + " ";
         } else {
-            // ⚡ Just preview, don’t save
+            // 👀 Just preview, don't save permanently
             interimTranscript = transcriptChunk;
         }
     }
 
-    // 👇 Show only preview + confirmed
+    // 👇 Always show: confirmed text + live preview
     document.getElementById("userInput").value =
-        this.transcript + interimTranscript;
+        (this.transcript + interimTranscript).trim();
     adjustTextareaHeight();
 };
+
 
 
 
