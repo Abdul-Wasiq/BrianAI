@@ -1,4 +1,4 @@
-// alert("Working")
+alert("Working")
 const dictate = new Dictate();
 
 // Expose functions to global scope
