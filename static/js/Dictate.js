@@ -13,21 +13,22 @@ class Dictate {
 
         this.recognition.onresult = (event) => {
     let interimTranscript = "";
-
+    
+    // Process all results since last event
     for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcriptChunk = event.results[i][0].transcript.trim();
-
+        const transcriptChunk = event.results[i][0].transcript;
+        
         if (event.results[i].isFinal) {
-            // ✅ Save confirmed text ONCE
+            // ✅ FINAL result - add to permanent transcript
             this.transcript += transcriptChunk + " ";
         } else {
-            // 👀 Just preview, don't save permanently
+            // 🎯 INTERIM result - only for current preview
             interimTranscript = transcriptChunk;
         }
     }
-
-    // 👇 Always show: confirmed text + live preview
-    document.getElementById("userInput").value =
+    
+    // 👇 Show confirmed text + current interim preview
+    document.getElementById("userInput").value = 
         (this.transcript + interimTranscript).trim();
     adjustTextareaHeight();
 };
