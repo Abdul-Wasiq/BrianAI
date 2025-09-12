@@ -18,18 +18,20 @@ class Dictate {
         const transcriptChunk = event.results[i][0].transcript;
 
         if (event.results[i].isFinal) {
-            // ✅ Save only final confirmed results
+            // ✅ Save final result ONCE
             this.transcript += transcriptChunk + " ";
         } else {
-            // ⚡ Temporary text while user is still speaking
-            interimTranscript += transcriptChunk;
+            // ⚡ Just preview, don’t save
+            interimTranscript = transcriptChunk;
         }
     }
 
-    // Optional: show live text in input box
-    document.getElementById('userInput').value = this.transcript + interimTranscript;
+    // 👇 Show only preview + confirmed
+    document.getElementById("userInput").value =
+        this.transcript + interimTranscript;
     adjustTextareaHeight();
 };
+
 
 
         this.recognition.onerror = (event) => {
