@@ -11,19 +11,26 @@ class Dictate {
         this.recognition.interimResults = true; // show words as user speaks
         this.transcript = "";
 
-        // When speech result is detected
         this.recognition.onresult = (event) => {
-            let finalTranscript = "";
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcriptChunk = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    this.transcript += transcriptChunk + " ";
-                } else {
-                    finalTranscript += transcriptChunk;
-                }
-            }
-            console.log("🎙️ Transcript:", this.transcript + finalTranscript);
-        };
+    let interimTranscript = "";
+
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcriptChunk = event.results[i][0].transcript;
+
+        if (event.results[i].isFinal) {
+            // ✅ Save only final confirmed results
+            this.transcript += transcriptChunk + " ";
+        } else {
+            // ⚡ Temporary text while user is still speaking
+            interimTranscript += transcriptChunk;
+        }
+    }
+
+    // Optional: show live text in input box
+    document.getElementById('userInput').value = this.transcript + interimTranscript;
+    adjustTextareaHeight();
+};
+
 
         this.recognition.onerror = (event) => {
             console.error("❌ SpeechRecognition Error:", event.error);
