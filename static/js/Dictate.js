@@ -1,51 +1,53 @@
-// static/js/Dictate.js
 class Dictate {
     constructor() {
-        this.transcript = ""; // store the latest recognized text
-
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
         if (!SpeechRecognition) {
-            console.error("❌ Browser does not support speech recognition.");
-            this.recognition = null;
-        } else {
-            this.recognition = new SpeechRecognition();
-this.recognition.continuous = true;  // keep listening
-this.recognition.interimResults = false;
-this.recognition.lang = 'en-US';
-
-this.recognition.onresult = (event) => {
-    this.transcript = event.results[event.results.length - 1][0].transcript;
-    console.log("🎤 Transcript:", this.transcript);
-};
-
-this.recognition.onerror = (event) => {
-    console.error("Speech Recognition Error:", event.error);
-};
-
-// Auto-restart if it stops
-this.recognition.onend = () => {
-    console.log("🎤 Restarting recognition...");
-    this.recognition.start();
-};
+            console.error("❌ Browser does not support SpeechRecognition.");
+            return;
         }
+
+        this.recognition = new SpeechRecognition();
+        this.recognition.continuous = true;  // keep listening
+        this.recognition.interimResults = true; // show words as user speaks
+        this.transcript = "";
+
+        // When speech result is detected
+        this.recognition.onresult = (event) => {
+            let finalTranscript = "";
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcriptChunk = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    this.transcript += transcriptChunk + " ";
+                } else {
+                    finalTranscript += transcriptChunk;
+                }
+            }
+            console.log("🎙️ Transcript:", this.transcript + finalTranscript);
+        };
+
+        this.recognition.onerror = (event) => {
+            console.error("❌ SpeechRecognition Error:", event.error);
+        };
     }
 
     start() {
-        if (!this.recognition) return;
-        this.transcript = ""; // reset before each start
+        console.log("▶️ Dictation started...");
+        this.transcript = "";
         this.recognition.start();
     }
 
     stop() {
-        if (!this.recognition) return;
+        console.log("⏹️ Dictation stopped.");
         this.recognition.stop();
     }
 
     getTranscript() {
-        return this.transcript;
+        return this.transcript.trim();
+    }
+
+    clearTranscript() {
+        this.transcript = "";
     }
 }
 
-window.Dictate = Dictate;
 window.dictate = new Dictate();

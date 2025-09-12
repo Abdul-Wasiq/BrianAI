@@ -1745,64 +1745,63 @@ document.querySelectorAll('.input-action-button').forEach(button => {
 /**
  * This function handles the click on the dictate (microphone) button.
  */
+const inputArea = document.getElementById('input-area');
+const fullscreenBtn = document.querySelector('.input-fullscreen-toggle');
+
+// Dictate button (start / stop toggle)
 function handleDictateButtonClick() {
-    console.log("✅ Dictate button clicked! The new feature is connected.");
-
-    // Clear previous transcript before starting new dictation
-    dictate.transcript = "";
-
-    dictate.start();
-
-    const inputArea = document.getElementById('input-area');
-    const fullscreenBtn = document.querySelector('.input-fullscreen-toggle');
-    
+    console.log("🎤 Dictate button clicked.");
     const isNowActive = !inputArea.classList.contains('dictation-active');
     inputArea.classList.toggle('dictation-active');
-    
+
     if (isNowActive) {
-        console.log("🎤 Dictation mode STARTED.");
-        fullscreenBtn.style.display = "none"; 
+        console.log("🎙️ Listening...");
+        dictate.start();
+        fullscreenBtn.style.display = "none";
     } else {
-        console.log("⏹️ Dictation mode STOPPED.");
+        console.log("🛑 Dictation manually toggled off.");
+        dictate.stop();
         fullscreenBtn.style.display = "inline-block";
     }
 }
 
-
-// NEW: Function to STOP dictation and PUT text in input box
-  // NEW: Function to STOP dictation and put text in input box
+// Stop button → stop listening & clear transcript
 function stopDictation() {
     console.log("⏹️ Stop button clicked.");
-    const inputArea = document.getElementById('input-area');
+    inputArea.classList.remove('dictation-active');
+    dictate.stop();
+    dictate.clearTranscript();  // delete text completely
+    fullscreenBtn.style.display = "inline-block";
+}
+
+// Show Text button → stop listening & put transcript in input box
+function showTextDictation() {
+    console.log("📜 Show Text button clicked.");
     inputArea.classList.remove('dictation-active');
     dictate.stop();
 
-    dictate.transcript = ""; // <-- clear transcript here too
-}
-
-
-// NEW: Function to STOP dictation and SEND text directly to Brian
-function sendDictation() {
-    console.log("📤 Send button clicked.");
-    const inputArea = document.getElementById('input-area');
-    inputArea.classList.remove('dictation-active'); // Hide dictate UI
-    // Add this line ^^^^
-    
-    // ** In Phase 5, we will add the transcribed text here **
-    // const transcribedText = "This is a test transcript.";
-    // document.getElementById('userInput').value = transcribedText;
-    // sendMessage(); // This is your existing function to send the message
-}
-
-// NEW: Function to STOP dictation and PUT text in input box
-function showTextDictation() {
-    console.log("Show Text button clicked.");
-    const transcript = window.dictate.getTranscript();
-    console.log("📌 Transcript to show:", transcript);
-
+    const transcript = dictate.getTranscript();
     document.getElementById('userInput').value = transcript;
     adjustTextareaHeight();
+
+    fullscreenBtn.style.display = "inline-block";
 }
+
+// Send button → stop listening & send transcript
+function sendDictation() {
+    console.log("📤 Send button clicked.");
+    inputArea.classList.remove('dictation-active');
+    dictate.stop();
+
+    const transcript = dictate.getTranscript();
+    document.getElementById('userInput').value = transcript;
+
+    // You already have sendMessage() in Python backend
+    // sendMessage();
+
+    fullscreenBtn.style.display = "inline-block";
+}
+
 
 
 // [PHASE 2 END]
