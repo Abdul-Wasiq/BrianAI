@@ -12,26 +12,26 @@ class Dictate {
         this.transcript = "";
 
         this.recognition.onresult = (event) => {
-    let interimTranscript = "";
+            let interimTranscript = "";
 
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcriptChunk = event.results[i][0].transcript;
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcriptChunk = event.results[i][0].transcript;
 
-        if (event.results[i].isFinal) {
-            // ✅ Add only once to permanent transcript
-            this.transcript += transcriptChunk + " ";
-        } else {
-            // ✅ Collect all interim results
-            interimTranscript += transcriptChunk;
-        }
-    }
+                if (event.results[i].isFinal) {
+                    // ✅ Add only once to permanent transcript
+                    this.transcript += transcriptChunk + " ";
+                } else {
+                    // ✅ Collect all interim results
+                    interimTranscript += transcriptChunk;
+                }
+            }
 
-    // ✅ Show permanent + interim preview (no duplicates)
-    document.getElementById("userInput").value =
-        (this.transcript + interimTranscript).trim();
+            // ✅ Show permanent + interim preview (no duplicates)
+            document.getElementById("userInput").value =
+                (this.transcript + interimTranscript).trim();
 
-    adjustTextareaHeight();
-};
+            adjustTextareaHeight();
+        };
 
 
 
