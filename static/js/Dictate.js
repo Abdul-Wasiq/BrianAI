@@ -7,32 +7,27 @@ class Dictate {
         }
 
         this.recognition = new SpeechRecognition();
-        this.recognition.continuous = true;  // keep listening
-        this.recognition.interimResults = true; // show words as user speaks
-        this.transcript = "";
+        this.recognition.continuous = true;
+        this.recognition.interimResults = true;
+        this.finalTranscript = ""; // Use a separate variable for final, confirmed text
 
         this.recognition.onresult = (event) => {
-    let interimTranscript = "";
+            let interimTranscript = '';
+            
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    // This is a new FINAL segment, so append it to our permanent transcript
+                    this.finalTranscript += event.results[i][0].transcript;
+                } else {
+                    // This is an interim segment, just store it to display temporarily
+                    interimTranscript += event.results[i][0].transcript;
+                }
+            }
 
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcriptChunk = event.results[i][0].transcript;
-
-        if (event.results[i].isFinal) {
-            // Add final text only once
-            this.transcript += transcriptChunk + " ";
-        } else {
-            // Replace interim preview each time
-            interimTranscript = transcriptChunk;
-        }
-    }
-
-    // Show confirmed + current interim (no duplicates)
-    document.getElementById("userInput").value =
-        (this.transcript + interimTranscript).trim();
-
-    adjustTextareaHeight();
-};
-
+            // Update the input field with the combined text
+            document.getElementById("userInput").value = this.finalTranscript + interimTranscript;
+            adjustTextareaHeight();
+        };
 
         this.recognition.onerror = (event) => {
             console.error("❌ SpeechRecognition Error:", event.error);
@@ -41,7 +36,7 @@ class Dictate {
 
     start() {
         console.log("▶️ Dictation started...");
-        this.transcript = "";
+        this.finalTranscript = ""; // Reset transcript on start
         this.recognition.start();
     }
 
@@ -51,11 +46,12 @@ class Dictate {
     }
 
     getTranscript() {
-        return this.transcript.trim();
+        // Return the full, final transcript
+        return this.finalTranscript.trim();
     }
 
     clearTranscript() {
-        this.transcript = "";
+        this.finalTranscript = "";
     }
 }
 
