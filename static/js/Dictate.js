@@ -18,23 +18,20 @@ class Dictate {
         const transcriptChunk = event.results[i][0].transcript;
 
         if (event.results[i].isFinal) {
-            // ✅ Add only once to permanent transcript
+            // Add final text only once
             this.transcript += transcriptChunk + " ";
         } else {
-            // ✅ Collect all interim results
-            interimTranscript += transcriptChunk;
+            // Replace interim preview each time
+            interimTranscript = transcriptChunk;
         }
     }
 
-    // ✅ Show permanent + interim preview (no duplicates)
+    // Show confirmed + current interim (no duplicates)
     document.getElementById("userInput").value =
         (this.transcript + interimTranscript).trim();
 
     adjustTextareaHeight();
 };
-
-
-
 
 
         this.recognition.onerror = (event) => {
