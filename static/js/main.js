@@ -1774,12 +1774,14 @@ function stopDictation() {
 }
 
 // Show Text button → stop listening & put transcript in input box
+// Show Text button → stop listening & put transcript in input box
 function showTextDictation() {
     console.log("📜 Show Text button clicked.");
     inputArea.classList.remove('dictation-active');
     dictate.stop();
 
     const transcript = dictate.getTranscript();
+    alert('Transcript captured: ' + transcript); // This will show you the raw transcript
     document.getElementById('userInput').value = transcript;
     adjustTextareaHeight();
 
