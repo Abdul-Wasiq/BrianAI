@@ -1781,7 +1781,6 @@ function showTextDictation() {
     dictate.stop();
 
     const transcript = dictate.getTranscript();
-    alert('Transcript captured: ' + transcript); // This will show you the raw transcript
     document.getElementById('userInput').value = transcript;
     adjustTextareaHeight();
 
